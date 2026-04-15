@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 점심 메이트</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --primary: #FF6B35;
+    --primary-light: #FFF3EE;
+    --bg: #F8F9FA;
+    --card-bg: #FFFFFF;
+    --text: #1A1A2E;
+    --text-sub: #6B7280;
+    --border: #E5E7EB;
+    --success: #10B981;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    max-width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  .header {
+    background: var(--primary);
+    color: white;
+    padding: 20px 24px;
+    text-align: center;
+  }
+  .header h1 { font-size: 20px; font-weight: 700; }
+  .header p { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+
+  /* Main content */
+  .content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  /* Step indicator */
+  .steps {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .step-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.3s;
+  }
+  .step-dot.active { background: var(--primary); width: 28px; border-radius: 5px; }
+  .step-dot.done { background: var(--success); }
+
+  /* Section title */
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .section-desc {
+    font-size: 14px;
+    color: var(--text-sub);
+    margin-bottom: 20px;
+  }
+
+  /* Mood selector */
+  .mood-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .mood-btn {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+  }
+  .mood-btn:hover { border-color: var(--primary); }
+  .mood-btn.selected {
+    border-color: var(--primary);
+    background: var(--primary-light);
+  }
+  .mood-btn .emoji { font-size: 28px; display: block; margin-bottom: 6px; }
+
+  /* Budget selector */
+  .budget-options {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .budget-btn {
+    flex: 1;
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .budget-btn:hover { border-color: var(--primary); }
+  .budget-btn.selected {
+    border-color: var(--primary);
+    background: var(--primary-light);
+  }
+  .budget-btn .price { font-size: 15px; font-weight: 700; display: block; margin-bottom: 2px; }
+
+  /* CTA Button */
+  .cta-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+  .cta-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .cta-btn:disabled { background: var(--border); cursor: not-allowed; transform: none; }
+
+  /* Loading */
+  .loading {
+    text-align: center;
+    padding: 60px 20px;
+  }
+  .loading .spinner {
+    width: 48px; height: 48px;
+    border: 4px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 20px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading p { color: var(--text-sub); font-size: 15px; }
+
+  /* Result cards */
+  .result-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--primary);
+    animation: slideUp 0.4s ease-out;
+  }
+  .result-card:nth-child(2) { animation-delay: 0.1s; }
+  .result-card:nth-child(3) { animation-delay: 0.2s; }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .result-rank {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+  .result-menu {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .result-restaurant {
+    font-size: 14px;
+    color: var(--text-sub);
+    margin-bottom: 12px;
+  }
+  .result-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text-sub);
+    margin-bottom: 12px;
+  }
+  .result-reason {
+    background: var(--primary-light);
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    color: var(--primary);
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+  .result-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .btn-accept {
+    flex: 1;
+    padding: 12px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-reject {
+    padding: 12px 16px;
+    background: var(--bg);
+    color: var(--text-sub);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  /* Accepted state */
+  .accepted-view {
+    text-align: center;
+    padding: 40px 20px;
+    animation: slideUp 0.4s ease-out;
+  }
+  .accepted-view .check { font-size: 64px; margin-bottom: 16px; }
+  .accepted-view h2 { font-size: 22px; margin-bottom: 8px; }
+  .accepted-view p { color: var(--text-sub); font-size: 14px; line-height: 1.6; }
+  .map-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 14px 28px;
+    background: var(--primary);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  /* Retry button */
+  .retry-section {
+    text-align: center;
+    margin-top: 8px;
+    margin-bottom: 20px;
+  }
+  .btn-retry {
+    padding: 12px 24px;
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* Screens */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 12px;
+    font-size: 11px;
+    color: var(--text-sub);
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🍽️ 오늘의 점심 메이트</h1>
+  <p>AI가 골라주는 오늘의 완벽한 점심</p>
+</div>
+
+<div class="content">
+  <!-- Screen 1: Mood -->
+  <div id="screen-mood" class="screen active">
+    <div class="steps">
+      <div class="step-dot active"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+    </div>
+    <h2 class="section-title">오늘 기분이 어떠세요?</h2>
+    <p class="section-desc">기분에 딱 맞는 메뉴를 추천해드릴게요</p>
+    <div class="mood-grid">
+      <div class="mood-btn" data-mood="happy" onclick="selectMood(this)">
+        <span class="emoji">😊</span>기분 좋음
+      </div>
+      <div class="mood-btn" data-mood="tired" onclick="selectMood(this)">
+        <span class="emoji">😫</span>지침/피곤
+      </div>
+      <div class="mood-btn" data-mood="spicy" onclick="selectMood(this)">
+        <span class="emoji">🔥</span>매운게 땡김
+      </div>
+      <div class="mood-btn" data-mood="light" onclick="selectMood(this)">
+        <span class="emoji">🥗</span>가볍게
+      </div>
+      <div class="mood-btn" data-mood="special" onclick="selectMood(this)">
+        <span class="emoji">🎉</span>특별한 날
+      </div>
+      <div class="mood-btn" data-mood="comfort" onclick="selectMood(this)">
+        <span class="emoji">🏠</span>편안한 맛
+      </div>
+    </div>
+    <button class="cta-btn" id="btn-mood-next" disabled onclick="goToBudget()">다음 →</button>
+  </div>
+
+  <!-- Screen 2: Budget -->
+  <div id="screen-budget" class="screen">
+    <div class="steps">
+      <div class="step-dot done"></div>
+      <div class="step-dot active"></div>
+      <div class="step-dot"></div>
+    </div>
+    <h2 class="section-title">예산은 얼마 정도?</h2>
+    <p class="section-desc">부담 없는 가격대를 선택해주세요</p>
+    <div class="budget-options">
+      <div class="budget-btn" data-budget="low" onclick="selectBudget(this)">
+        <span class="price">~8천</span>가성비
+      </div>
+      <div class="budget-btn" data-budget="mid" onclick="selectBudget(this)">
+        <span class="price">~1.5만</span>적당히
+      </div>
+      <div class="budget-btn" data-budget="high" onclick="selectBudget(this)">
+        <span class="price">1.5만~</span>넉넉히
+      </div>
+    </div>
+    <button class="cta-btn" id="btn-budget-next" disabled onclick="getRecommendation()">AI 추천 받기 🤖</button>
+  </div>
+
+  <!-- Screen 3: Loading -->
+  <div id="screen-loading" class="screen">
+    <div class="steps">
+      <div class="step-dot done"></div>
+      <div class="step-dot done"></div>
+      <div class="step-dot active"></div>
+    </div>
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>AI가 메뉴를 고르고 있어요...</p>
+      <p style="font-size:12px; margin-top:8px; color:#aaa;">기분 · 날씨 · 예산을 분석 중</p>
+    </div>
+  </div>
+
+  <!-- Screen 4: Results -->
+  <div id="screen-results" class="screen">
+    <div class="steps">
+      <div class="step-dot done"></div>
+      <div class="step-dot done"></div>
+      <div class="step-dot done"></div>
+    </div>
+    <h2 class="section-title">오늘의 추천 메뉴 🎯</h2>
+    <p class="section-desc" id="result-context"></p>
+    <div id="result-cards"></div>
+    <div class="retry-section">
+      <button class="btn-retry" onclick="resetAll()">🔄 처음부터 다시 고르기</button>
+    </div>
+  </div>
+
+  <!-- Screen 5: Accepted -->
+  <div id="screen-accepted" class="screen">
+    <div class="accepted-view">
+      <div class="check">✅</div>
+      <h2 id="accepted-menu"></h2>
+      <p id="accepted-detail"></p>
+      <a class="map-link" href="#" onclick="resetAll(); return false;">🔄 다시 추천받기</a>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  오늘의 점심 메이트 — FastCampus AI Native PM 특강 데모 | Built with Claude Code
+</div>
+
+<script>
+// State
+let selectedMood = null;
+let selectedBudget = null;
+
+// Recommendation database
+const menuDB = {
+  happy: {
+    low: [
+      { menu: "치즈 돈까스", restaurant: "카츠쿠라", distance: "350m", price: "7,500원", reason: "기분 좋은 날엔 바삭한 돈까스가 기쁨을 더해줘요! 치즈가 쭉~ 늘어나는 비주얼도 최고" },
+      { menu: "불고기 덮밥", restaurant: "한솥 도시락", distance: "150m", price: "6,500원", reason: "달콤한 불고기로 좋은 기분을 유지해보세요. 가성비도 최고!" },
+      { menu: "참치김밥 + 라볶이", restaurant: "김밥천국", distance: "200m", price: "7,000원", reason: "기분 좋을 때 먹는 분식은 행복 그 자체. 든든함까지 보장" }
+    ],
+    mid: [
+      { menu: "연어 포케볼", restaurant: "포케올데이", distance: "400m", price: "12,000원", reason: "좋은 기분에 건강한 한 끼! 신선한 연어가 기분을 더 UP" },
+      { menu: "수제버거 세트", restaurant: "파이브가이즈", distance: "500m", price: "14,000원", reason: "기분 좋은 날엔 묵직한 수제버거로 보상하세요!" },
+      { menu: "크림 파스타", restaurant: "일리카페", distance: "300m", price: "13,000원", reason: "부드러운 크림 파스타가 행복한 기분을 완성해드릴게요" }
+    ],
+    high: [
+      { menu: "숙성 한우 초밥", restaurant: "스시히로", distance: "450m", price: "18,000원", reason: "기분 좋은 날, 스스로에게 주는 작은 사치. 입에서 녹아요" },
+      { menu: "랍스터 파스타", restaurant: "더키친", distance: "500m", price: "22,000원", reason: "특별히 좋은 날엔 랍스터로 기분을 격상시켜보세요!" },
+      { menu: "우니 덮밥", restaurant: "마루이시", distance: "380m", price: "19,000원", reason: "기분 좋은 날의 완벽한 보상. 바다의 향이 가득" }
+    ]
+  },
+  tired: {
+    low: [
+      { menu: "설렁탕", restaurant: "신선설농탕", distance: "250m", price: "8,000원", reason: "피곤할 때는 뜨끈한 설렁탕이 보약! 깊은 국물이 에너지를 채워줘요" },
+      { menu: "순대국밥", restaurant: "백암순대", distance: "180m", price: "7,500원", reason: "지친 몸에 뜨끈한 국밥 한 그릇이면 오후가 달라져요" },
+      { menu: "김치찌개 백반", restaurant: "시골밥상", distance: "120m", price: "7,000원", reason: "엄마 손맛 같은 김치찌개로 지친 몸과 마음을 달래보세요" }
+    ],
+    mid: [
+      { menu: "삼계탕", restaurant: "고려삼계탕", distance: "400m", price: "14,000원", reason: "피로 회복엔 삼계탕이 정답! 따뜻한 국물로 기력을 보충하세요" },
+      { menu: "갈비탕", restaurant: "서울갈비", distance: "350m", price: "13,000원", reason: "든든한 갈비탕 한 그릇이면 오후 업무도 거뜬해요" },
+      { menu: "장어덮밥", restaurant: "우나기야", distance: "450m", price: "15,000원", reason: "스태미나 음식의 끝판왕! 지친 기력을 한 방에 회복" }
+    ],
+    high: [
+      { menu: "한우 곰탕 정식", restaurant: "곰바위", distance: "500m", price: "18,000원", reason: "진~한 한우 곰탕으로 피로를 싹 날려보세요. 보양식의 정석" },
+      { menu: "전복죽 + 해물탕 세트", restaurant: "본죽&비빔밥", distance: "300m", price: "20,000원", reason: "전복의 영양이 지친 몸을 회복시켜줄 거예요" },
+      { menu: "양갈비 스테이크", restaurant: "램 가든", distance: "480m", price: "22,000원", reason: "피곤할 땐 고기! 양갈비의 풍미가 에너지를 채워줍니다" }
+    ]
+  },
+  spicy: {
+    low: [
+      { menu: "떡볶이 + 튀김 세트", restaurant: "죠스떡볶이", distance: "100m", price: "6,500원", reason: "매운 맛이 땡길 때의 국민 메뉴! 화끈한 떡볶이로 스트레스 해소" },
+      { menu: "짬뽕", restaurant: "홍콩반점", distance: "200m", price: "7,000원", reason: "칼칼한 해물짬뽕이 매운 맛 욕구를 확실히 채워줄 거예요" },
+      { menu: "열무비빔밥", restaurant: "본죽&비빔밥", distance: "250m", price: "7,500원", reason: "매콤달콤한 비빔밥으로 입맛을 확 깨워보세요" }
+    ],
+    mid: [
+      { menu: "마라탕 (중매운맛)", restaurant: "하이디라오", distance: "400m", price: "12,000원", reason: "매운 맛의 끝판왕! 마라의 얼얼함이 중독적이에요" },
+      { menu: "닭볶음탕", restaurant: "계림원", distance: "300m", price: "11,000원", reason: "칼칼한 양념에 졸인 닭볶음탕이 매운 맛 욕구를 확 채워줘요" },
+      { menu: "매운 갈비찜", restaurant: "서울갈비", distance: "350m", price: "14,000원", reason: "매콤한 양념이 배인 갈비찜은 매운 맛과 감칠맛의 완벽 조합" }
+    ],
+    high: [
+      { menu: "불닭 치즈 리조또", restaurant: "더키친", distance: "450m", price: "16,000원", reason: "매운 맛 + 치즈의 환상 조합! 프리미엄 매운맛을 경험해보세요" },
+      { menu: "사천식 마파두부 코스", restaurant: "도원", distance: "500m", price: "20,000원", reason: "본격 사천 스타일의 화끈한 마파두부! 입안이 불타오르는 쾌감" },
+      { menu: "스파이시 크랩", restaurant: "점보씨푸드", distance: "480m", price: "25,000원", reason: "칠리 크랩의 매콤한 소스가 온몸에 활력을 줄 거예요" }
+    ]
+  },
+  light: {
+    low: [
+      { menu: "유부초밥 + 메밀소바", restaurant: "소바니시", distance: "200m", price: "7,500원", reason: "가볍지만 든든한 조합! 깔끔한 한 끼로 오후도 가뿐하게" },
+      { menu: "샐러드 보울", restaurant: "써브웨이", distance: "100m", price: "6,900원", reason: "신선한 채소로 가볍고 건강하게! 오후 졸음도 방지돼요" },
+      { menu: "쌀국수", restaurant: "포하노이", distance: "300m", price: "8,000원", reason: "맑은 국물의 쌀국수로 속도 편안하고 칼로리도 가벼워요" }
+    ],
+    mid: [
+      { menu: "아사이볼 + 랩", restaurant: "웰빙카페", distance: "350m", price: "13,000원", reason: "슈퍼푸드로 가볍지만 영양가 높은 한 끼를 즐겨보세요" },
+      { menu: "연어 샐러드 세트", restaurant: "포케올데이", distance: "400m", price: "14,000원", reason: "단백질 가득, 칼로리는 낮은 완벽한 가벼운 식사" },
+      { menu: "두부 스테이크 정식", restaurant: "자연별곡", distance: "250m", price: "11,000원", reason: "식물성 단백질로 가볍지만 포만감 있는 건강식" }
+    ],
+    high: [
+      { menu: "그릭 샐러드 + 그릴드 치킨", restaurant: "더그린", distance: "400m", price: "17,000원", reason: "프리미엄 재료의 건강한 한 끼. 가볍지만 만족스러워요" },
+      { menu: "비건 코스 런치", restaurant: "플랜트", distance: "500m", price: "22,000원", reason: "세련된 비건 코스로 몸도 마음도 가볍게" },
+      { menu: "오마카세 샐러드", restaurant: "루사", distance: "350m", price: "19,000원", reason: "셰프가 엄선한 제철 재료의 프리미엄 샐러드" }
+    ]
+  },
+  special: {
+    low: [
+      { menu: "왕만두 전골", restaurant: "명동교자", distance: "300m", price: "8,000원", reason: "특별한 날이라고 비싸야 하는 건 아니죠! 정성 가득 만두 전골" },
+      { menu: "해물 칼국수", restaurant: "손칼국수", distance: "200m", price: "7,500원", reason: "손으로 직접 만든 면발의 특별한 맛. 가성비 좋은 맛집이에요" },
+      { menu: "수제 함박 정식", restaurant: "경양식집", distance: "250m", price: "8,000원", reason: "레트로 감성의 수제 함박스테이크! 소소하지만 특별한 점심" }
+    ],
+    mid: [
+      { menu: "초밥 런치 세트", restaurant: "스시히로", distance: "450m", price: "15,000원", reason: "특별한 날엔 신선한 초밥으로! 런치 세트라 부담도 적어요" },
+      { menu: "트러플 리조또", restaurant: "일리카페", distance: "300m", price: "14,000원", reason: "트러플의 향기로운 한 끼로 특별한 점심 시간을 만들어보세요" },
+      { menu: "양갈비 그릴", restaurant: "램 가든", distance: "480m", price: "15,000원", reason: "특별한 날의 점심은 양갈비로! 이국적인 풍미가 기분을 UP" }
+    ],
+    high: [
+      { menu: "한우 오마카세", restaurant: "마장동 한우", distance: "500m", price: "28,000원", reason: "특별한 날에 어울리는 한우 오마카세! 셰프의 손길이 느껴져요" },
+      { menu: "프렌치 런치 코스", restaurant: "레스토랑 에피", distance: "450m", price: "35,000원", reason: "기념일 같은 특별한 날엔 프렌치 코스로 격을 높여보세요" },
+      { menu: "참치 오마카세", restaurant: "스시 오이시", distance: "400m", price: "30,000원", reason: "특별한 날의 궁극 선택! 참치의 부위별 맛을 경험해보세요" }
+    ]
+  },
+  comfort: {
+    low: [
+      { menu: "김치볶음밥", restaurant: "백반집", distance: "150m", price: "6,500원", reason: "편안한 맛의 대표주자! 계란 프라이 올린 김치볶음밥의 위로" },
+      { menu: "된장찌개 백반", restaurant: "시골밥상", distance: "120m", price: "7,000원", reason: "엄마 밥상 같은 편안함. 구수한 된장찌개가 마음을 녹여요" },
+      { menu: "라면 + 공기밥", restaurant: "라면공방", distance: "100m", price: "5,500원", reason: "때로는 라면이 최고의 위로. 쫄깃한 면발에 밥 말아 완성!" }
+    ],
+    mid: [
+      { menu: "부대찌개", restaurant: "놀부부대찌개", distance: "300m", price: "10,000원", reason: "보글보글 끓는 부대찌개의 편안함은 언제나 옳아요" },
+      { menu: "제육볶음 정식", restaurant: "한식당", distance: "200m", price: "9,500원", reason: "매콤달콤 제육볶음 + 반찬 가득 정식으로 든든한 위로를" },
+      { menu: "돈까스 카레", restaurant: "카츠쿠라", distance: "350m", price: "11,000원", reason: "바삭한 돈까스와 부드러운 카레의 포근한 조합" }
+    ],
+    high: [
+      { menu: "소고기 미역국 정식", restaurant: "한일관", distance: "400m", price: "16,000원", reason: "정성 가득 소고기 미역국은 최고의 comfort food입니다" },
+      { menu: "가마솥 솥밥 정식", restaurant: "소반", distance: "450m", price: "18,000원", reason: "갓 지은 솥밥의 누룽지 한 숟갈이면 마음까지 따뜻해져요" },
+      { menu: "수제 햄버그 스테이크 세트", restaurant: "경양식당", distance: "350m", price: "17,000원", reason: "옛날 경양식집 감성의 수제 햄버그. 편안함의 끝판왕" }
+    ]
+  }
+};
+
+const moodLabels = {
+  happy: "기분 좋음 😊",
+  tired: "지침/피곤 😫",
+  spicy: "매운게 땡김 🔥",
+  light: "가볍게 🥗",
+  special: "특별한 날 🎉",
+  comfort: "편안한 맛 🏠"
+};
+
+const budgetLabels = {
+  low: "~8천원",
+  mid: "8천~1.5만원",
+  high: "1.5만원~"
+};
+
+function selectMood(el) {
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedMood = el.dataset.mood;
+  document.getElementById('btn-mood-next').disabled = false;
+}
+
+function selectBudget(el) {
+  document.querySelectorAll('.budget-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedBudget = el.dataset.budget;
+  document.getElementById('btn-budget-next').disabled = false;
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goToBudget() {
+  showScreen('screen-budget');
+}
+
+function getRecommendation() {
+  showScreen('screen-loading');
+
+  // Simulate AI processing delay
+  setTimeout(() => {
+    const recommendations = menuDB[selectedMood][selectedBudget];
+    const contextText = `${moodLabels[selectedMood]} · ${budgetLabels[selectedBudget]} 기준`;
+    document.getElementById('result-context').textContent = contextText;
+
+    const container = document.getElementById('result-cards');
+    container.innerHTML = '';
+
+    recommendations.forEach((rec, i) => {
+      const card = document.createElement('div');
+      card.className = 'result-card';
+      card.innerHTML = `
+        <span class="result-rank">${i === 0 ? '🏆 BEST' : i === 1 ? '2nd' : '3rd'}</span>
+        <div class="result-menu">${rec.menu}</div>
+        <div class="result-restaurant">${rec.restaurant}</div>
+        <div class="result-meta">
+          <span>📍 ${rec.distance}</span>
+          <span>💰 ${rec.price}</span>
+        </div>
+        <div class="result-reason">💡 ${rec.reason}</div>
+        <div class="result-actions">
+          <button class="btn-accept" onclick="acceptMenu('${rec.menu}', '${rec.restaurant}', '${rec.distance}')">여기로 갈래요!</button>
+          <button class="btn-reject" onclick="this.textContent='🙅 패스'; this.disabled=true;">패스</button>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+
+    showScreen('screen-results');
+  }, 1800);
+}
+
+function acceptMenu(menu, restaurant, distance) {
+  document.getElementById('accepted-menu').textContent = `${menu}`;
+  document.getElementById('accepted-detail').innerHTML =
+    `<strong>${restaurant}</strong>에서<br>${menu} 드시러 가시는 거군요!<br><br>📍 ${distance} · 도보 약 ${parseInt(distance)*0.75 < 100 ? 1 : Math.ceil(parseInt(distance)/100)}분`;
+  showScreen('screen-accepted');
+}
+
+function resetAll() {
+  selectedMood = null;
+  selectedBudget = null;
+  document.querySelectorAll('.mood-btn, .budget-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('btn-mood-next').disabled = true;
+  document.getElementById('btn-budget-next').disabled = true;
+  showScreen('screen-mood');
+}
+</script>
+
+</body>
+</html>

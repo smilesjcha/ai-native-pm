@@ -1,0 +1,17 @@
+# Claude Code 개인 설정
+.claude/settings.local.json
+
+# macOS
+.DS_Store
+
+# 에디터 임시 파일
+*.swp
+*.swo
+*~
+
+# 백업 파일
+*.bak
+*.backup
+
+# Node
+node_modules/
