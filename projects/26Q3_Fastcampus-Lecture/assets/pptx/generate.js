@@ -1244,7 +1244,76 @@ function addCard(s, x, y, w, h, opts = {}) {
   addFooter(s, "오늘 실습에서는 로컬 HTML 파일로 충분합니다. 배포는 선택사항!");
 }
 
-// ─── SLIDE 33: CLOSING (Dark) ───
+// ─── SLIDE 33: AI 자동화 성장 로드맵 ───
+{
+  const s = lightSlide();
+  addTitle(s, "Next Level: AI 자동화로 생산성 높이기");
+  addSubtitle(s, "Claude는 요청하면 다 해주지만, 자주 하는 작업을 자동화하면 속도가 달라집니다");
+
+  // 피라미드 구조: 아래부터 위로
+  const levels = [
+    {
+      label: "지금 여기", badge: "Lv.1", bg: C.offWhite, badgeBg: C.lightGray, badgeColor: C.black,
+      title: "대화형 사용",
+      desc: "Claude에게 하나씩 요청  →  PRD 생성, 프로토타입 제작",
+    },
+    {
+      label: "", badge: "Lv.2", bg: C.offWhite, badgeBg: C.darkGray, badgeColor: C.white,
+      title: "MCP + Skill 세팅",
+      desc: "MCP: Jira·Slack 등 외부 서비스 연결  |  Skill: PM별 자주 쓰는 명령 미리 등록",
+    },
+    {
+      label: "", badge: "Lv.3", bg: C.offWhite, badgeBg: C.darkGray, badgeColor: C.white,
+      title: "Agent + Plugin 구성",
+      desc: "Agent: 복잡한 작업을 자동 수행하는 AI 비서  |  Plugin: MCP+Skill을 묶어 원클릭 실행",
+    },
+    {
+      label: "", badge: "Lv.4", bg: C.black, badgeBg: C.accent, badgeColor: C.white,
+      title: "PM 조직 통합 자동화",
+      desc: "팀 공통 Skill·Agent·Plugin을 표준화  →  온보딩 1일 내 세팅 완료",
+    },
+  ];
+
+  levels.forEach((lv, i) => {
+    const y = 1.1 + i * 0.7;
+    // Card
+    addCard(s, L.mx, y, L.cw, 0.58, { bg: lv.bg });
+    // Badge
+    s.addShape(pres.shapes.RECTANGLE, {
+      x: L.mx + 0.08, y: y + 0.08, w: 0.5, h: 0.42,
+      fill: { color: lv.badgeBg },
+    });
+    s.addText(lv.badge, {
+      x: L.mx + 0.08, y: y + 0.08, w: 0.5, h: 0.42,
+      fontSize: 10, fontFace: F.title, color: lv.badgeColor,
+      align: "center", valign: "middle", margin: 0,
+    });
+    // Title
+    s.addText(lv.title, {
+      x: 1.5, y, w: 2.3, h: 0.58,
+      fontSize: 13, fontFace: F.title, color: lv.bg === C.black ? C.white : C.black,
+      valign: "middle", margin: 0,
+    });
+    // Description
+    s.addText(lv.desc, {
+      x: 3.9, y, w: 5.3, h: 0.58,
+      fontSize: L.captionSize, fontFace: F.body,
+      color: lv.bg === C.black ? C.midGray : C.midGray,
+      valign: "middle", margin: 0, lineSpacingMultiple: 1.25,
+    });
+    // "지금 여기" label
+    if (lv.label) {
+      s.addText("← " + lv.label, {
+        x: L.mx + L.cw - 1.2, y: y + 0.05, w: 1.1, h: 0.25,
+        fontSize: 9, fontFace: F.bold, color: C.accent, align: "right", margin: 0,
+      });
+    }
+  });
+
+  addAccentFooter(s, "자동화는 한 번에 하는 게 아닙니다. 반복되는 작업부터 하나씩 — 그게 PM의 생산성입니다.");
+}
+
+// ─── SLIDE 34: CLOSING (Dark) ───
 {
   const s = darkSlide();
   s.addText("오늘 여러분이 만든 것", {
