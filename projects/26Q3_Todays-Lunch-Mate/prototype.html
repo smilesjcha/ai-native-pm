@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>오늘의 점심 메이트 — 프로토타입</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  /* ───────── Design Tokens ───────── */
+  :root {
+    --color-primary: #FF6B35;
+    --color-primary-dark: #E8551E;
+    --color-primary-soft: #FFEDE2;
+    --color-accent: #FFB84D;
+    --color-bg: #FFF8F1;
+    --color-card: #FFFFFF;
+    --color-text: #2D1810;
+    --color-text-sub: #8A7A6E;
+    --color-border: #F2E8DC;
+    --color-success: #5EAD7C;
+    --shadow-sm: 0 2px 8px rgba(45, 24, 16, 0.04);
+    --shadow-md: 0 8px 24px rgba(45, 24, 16, 0.08);
+    --shadow-lg: 0 16px 48px rgba(45, 24, 16, 0.12);
+    --radius-sm: 12px;
+    --radius-md: 18px;
+    --radius-lg: 24px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--color-text);
+    background: linear-gradient(180deg, #FFF4E6 0%, #FFF8F1 40%);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+    padding: 0;
+  }
+
+  /* 모바일 뷰포트 (데스크톱에서도 폰 시뮬레이션) */
+  .app {
+    width: 100%;
+    max-width: 420px;
+    min-height: 100vh;
+    background: var(--color-bg);
+    position: relative;
+    overflow: hidden;
+    padding-bottom: 100px;
+  }
+
+  @media (min-width: 768px) {
+    body {
+      padding: 24px;
+      background: #F5ECE0;
+    }
+    .app {
+      min-height: calc(100vh - 48px);
+      border-radius: 32px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+  }
+
+  /* ───────── Header ───────── */
+  header {
+    padding: 20px 24px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(8px);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .btn-back {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: var(--color-card);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+    font-size: 18px;
+    color: var(--color-text);
+  }
+
+  .btn-back:hover { background: var(--color-primary-soft); }
+
+  /* ───────── Step Indicator ───────── */
+  .step-indicator {
+    display: flex;
+    gap: 6px;
+    padding: 0 24px 12px;
+  }
+
+  .step-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--color-border);
+    border-radius: 2px;
+    transition: background 0.3s;
+  }
+
+  .step-bar.active { background: var(--color-primary); }
+
+  /* ───────── Screen Layout ───────── */
+  .screen {
+    padding: 16px 24px 32px;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .screen.hidden { display: none; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .screen-title {
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+
+  .screen-subtitle {
+    font-size: 15px;
+    color: var(--color-text-sub);
+    margin-bottom: 32px;
+    line-height: 1.5;
+  }
+
+  /* ───────── Landing ───────── */
+  .hero {
+    padding: 40px 24px 24px;
+    text-align: center;
+  }
+
+  .hero-emoji {
+    font-size: 72px;
+    margin-bottom: 16px;
+    display: inline-block;
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .hero-title {
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1.3;
+    letter-spacing: -0.8px;
+    margin-bottom: 12px;
+  }
+
+  .hero-title .highlight {
+    background: linear-gradient(120deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 15px;
+    color: var(--color-text-sub);
+    line-height: 1.6;
+    margin-bottom: 40px;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 12px;
+    padding: 0 24px 40px;
+  }
+
+  .stat-card {
+    flex: 1;
+    background: var(--color-card);
+    border-radius: var(--radius-md);
+    padding: 16px 12px;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .stat-card .emoji { font-size: 22px; margin-bottom: 6px; }
+  .stat-card .value { font-size: 18px; font-weight: 800; color: var(--color-primary); }
+  .stat-card .label { font-size: 11px; color: var(--color-text-sub); margin-top: 2px; }
+
+  /* ───────── Chips (Mood) ───────── */
+  .chip-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .chip {
+    background: var(--color-card);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 20px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+    user-select: none;
+  }
+
+  .chip:hover { border-color: var(--color-primary); transform: translateY(-2px); }
+
+  .chip.selected {
+    background: var(--color-primary-soft);
+    border-color: var(--color-primary);
+    box-shadow: 0 8px 16px rgba(255, 107, 53, 0.15);
+  }
+
+  .chip-emoji { font-size: 32px; }
+  .chip-label { font-weight: 600; font-size: 15px; }
+  .chip-desc { font-size: 12px; color: var(--color-text-sub); }
+
+  /* ───────── Radio (Budget) ───────── */
+  .radio-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .radio-item {
+    background: var(--color-card);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .radio-item:hover { border-color: var(--color-primary); }
+
+  .radio-item.selected {
+    background: var(--color-primary-soft);
+    border-color: var(--color-primary);
+  }
+
+  .radio-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .radio-emoji {
+    font-size: 26px;
+    width: 44px;
+    height: 44px;
+    background: var(--color-bg);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .radio-title { font-weight: 600; font-size: 15px; margin-bottom: 2px; }
+  .radio-sub { font-size: 12px; color: var(--color-text-sub); }
+
+  .radio-circle {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--color-border);
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .radio-item.selected .radio-circle {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    box-shadow: inset 0 0 0 4px white;
+  }
+
+  /* ───────── CTA Button ───────── */
+  .cta-wrap {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 420px;
+    padding: 16px 24px 24px;
+    background: linear-gradient(180deg, rgba(255, 248, 241, 0) 0%, var(--color-bg) 30%);
+    z-index: 20;
+  }
+
+  @media (min-width: 768px) {
+    .cta-wrap {
+      position: absolute;
+      left: 0;
+      transform: none;
+    }
+  }
+
+  .cta {
+    width: 100%;
+    padding: 17px;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .cta:hover:not(:disabled) { background: var(--color-primary-dark); transform: translateY(-1px); }
+  .cta:active:not(:disabled) { transform: translateY(0); }
+  .cta:disabled { background: #D4C4B5; cursor: not-allowed; box-shadow: none; color: #fff; }
+
+  /* ───────── Loading ───────── */
+  .loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 24px;
+    text-align: center;
+  }
+
+  .loading-emoji {
+    font-size: 56px;
+    margin-bottom: 24px;
+    animation: spin 2s linear infinite;
+    display: inline-block;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .loading-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .loading-sub { font-size: 14px; color: var(--color-text-sub); }
+
+  /* ───────── Result Cards ───────── */
+  .reco-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .reco-card {
+    background: var(--color-card);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .reco-card:hover { border-color: var(--color-primary); box-shadow: var(--shadow-md); }
+
+  .reco-rank {
+    position: absolute;
+    top: -8px;
+    left: 16px;
+    background: var(--color-primary);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
+  }
+
+  .reco-rank.first { background: linear-gradient(135deg, var(--color-primary), var(--color-accent)); }
+
+  .reco-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    margin-top: 4px;
+  }
+
+  .reco-title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+  .reco-menu { font-size: 13px; color: var(--color-text-sub); margin-top: 2px; }
+
+  .reco-meta {
+    display: flex;
+    gap: 10px;
+    margin: 12px 0;
+    flex-wrap: wrap;
+  }
+
+  .meta-badge {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--color-bg);
+    color: var(--color-text-sub);
+    font-weight: 500;
+  }
+
+  .meta-badge.price { background: #FFF4E0; color: #B8651E; }
+  .meta-badge.distance { background: #E8F4EC; color: #2D7F4F; }
+
+  .reco-reason {
+    background: var(--color-primary-soft);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--color-text);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .reason-icon { font-size: 16px; flex-shrink: 0; }
+  .reason-text { flex: 1; }
+  .reason-text b { color: var(--color-primary-dark); }
+
+  /* ───────── Action Row ───────── */
+  .action-row {
+    display: flex;
+    gap: 12px;
+  }
+
+  .btn-secondary {
+    flex: 1;
+    padding: 14px;
+    background: var(--color-card);
+    color: var(--color-text);
+    border: 2px solid var(--color-border);
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--color-primary-soft); border-color: var(--color-primary); }
+
+  /* ───────── Detail Screen ───────── */
+  .detail-hero {
+    height: 180px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, var(--color-accent), var(--color-primary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+    margin-bottom: 20px;
+  }
+
+  .detail-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 16px 0 24px;
+  }
+
+  .info-item {
+    background: var(--color-card);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .info-label { font-size: 11px; color: var(--color-text-sub); margin-bottom: 4px; }
+  .info-value { font-weight: 600; font-size: 14px; }
+
+  .feedback-bar {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .feedback-btn {
+    flex: 1;
+    padding: 14px;
+    background: var(--color-card);
+    border: 2px solid var(--color-border);
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+
+  .feedback-btn.like:hover { background: #E8F4EC; border-color: var(--color-success); color: var(--color-success); }
+  .feedback-btn.dislike:hover { background: #FBE8E8; border-color: #C44D4D; color: #C44D4D; }
+
+  /* ───────── Toast ───────── */
+  .toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-text);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: var(--shadow-md);
+    z-index: 30;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ─────── Header ─────── -->
+  <header>
+    <button class="btn-back" id="btnBack" style="visibility: hidden;" aria-label="뒤로가기">←</button>
+    <div class="logo">
+      <div class="logo-icon">🍱</div>
+      <span>오늘의 점심 메이트</span>
+    </div>
+    <div style="width: 36px;"></div>
+  </header>
+
+  <!-- Step Indicator -->
+  <div class="step-indicator" id="stepIndicator" style="display: none;">
+    <div class="step-bar" data-step="1"></div>
+    <div class="step-bar" data-step="2"></div>
+    <div class="step-bar" data-step="3"></div>
+  </div>
+
+  <!-- ─────── Screen 0: Landing ─────── -->
+  <section class="screen" id="screen-landing">
+    <div class="hero">
+      <div class="hero-emoji">🍜</div>
+      <h1 class="hero-title">
+        오늘 뭐 먹지?<br />
+        <span class="highlight">AI가 30초 안에</span> 골라드려요
+      </h1>
+      <p class="hero-sub">
+        기분과 예산만 알려주세요.<br />
+        Claude Haiku가 3가지 맞춤 메뉴를 추천합니다.
+      </p>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-card">
+        <div class="emoji">⏱️</div>
+        <div class="value">30초</div>
+        <div class="label">결정 시간</div>
+      </div>
+      <div class="stat-card">
+        <div class="emoji">🎯</div>
+        <div class="value">60%↑</div>
+        <div class="label">추천 수락률</div>
+      </div>
+      <div class="stat-card">
+        <div class="emoji">🏢</div>
+        <div class="value">강남·판교</div>
+        <div class="label">서비스 지역</div>
+      </div>
+    </div>
+
+    <div style="padding: 0 24px;">
+      <button class="cta" onclick="goto('mood')">시작하기</button>
+    </div>
+  </section>
+
+  <!-- ─────── Screen 1: Mood ─────── -->
+  <section class="screen hidden" id="screen-mood">
+    <h2 class="screen-title">오늘 기분이 어때요?</h2>
+    <p class="screen-subtitle">지금 끌리는 느낌을 하나 골라주세요</p>
+
+    <div class="chip-grid" id="moodGrid">
+      <!-- JS inject -->
+    </div>
+
+    <div class="cta-wrap">
+      <button class="cta" id="moodCta" disabled onclick="goto('budget')">다음</button>
+    </div>
+  </section>
+
+  <!-- ─────── Screen 2: Budget ─────── -->
+  <section class="screen hidden" id="screen-budget">
+    <h2 class="screen-title">예산은 얼마나?</h2>
+    <p class="screen-subtitle">1인 기준 점심 한 끼 예산을 골라주세요</p>
+
+    <div class="radio-list" id="budgetList">
+      <!-- JS inject -->
+    </div>
+
+    <div class="cta-wrap">
+      <button class="cta" id="budgetCta" disabled onclick="goto('loading')">추천받기</button>
+    </div>
+  </section>
+
+  <!-- ─────── Screen 3: Loading ─────── -->
+  <section class="screen hidden" id="screen-loading">
+    <div class="loading">
+      <div class="loading-emoji">🍳</div>
+      <div class="loading-title">AI가 메뉴를 고르는 중…</div>
+      <div class="loading-sub">기분과 예산, 주변 맛집을 분석하고 있어요</div>
+    </div>
+  </section>
+
+  <!-- ─────── Screen 4: Results ─────── -->
+  <section class="screen hidden" id="screen-result">
+    <h2 class="screen-title">오늘의 추천 🎉</h2>
+    <p class="screen-subtitle" id="resultSummary">기분·예산을 반영한 3가지 메뉴예요</p>
+
+    <div class="reco-list" id="recoList">
+      <!-- JS inject -->
+    </div>
+
+    <div class="action-row">
+      <button class="btn-secondary" onclick="regenerate()">🔄 다시 추천</button>
+      <button class="btn-secondary" onclick="reset()">처음부터</button>
+    </div>
+  </section>
+
+  <!-- ─────── Screen 5: Detail ─────── -->
+  <section class="screen hidden" id="screen-detail">
+    <div class="detail-hero" id="detailHero">🍽️</div>
+    <h2 class="screen-title" id="detailTitle">식당 이름</h2>
+    <p class="screen-subtitle" id="detailMenu">대표 메뉴</p>
+
+    <div class="detail-info-grid">
+      <div class="info-item">
+        <div class="info-label">📍 거리</div>
+        <div class="info-value" id="detailDistance">—</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">💰 예상 가격</div>
+        <div class="info-value" id="detailPrice">—</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">⏰ 영업</div>
+        <div class="info-value">11:00 – 21:00</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">⭐ 평점</div>
+        <div class="info-value" id="detailRating">4.3</div>
+      </div>
+    </div>
+
+    <div class="reco-reason" style="margin-bottom: 20px;">
+      <span class="reason-icon">✨</span>
+      <span class="reason-text" id="detailReason">추천 이유가 여기 표시됩니다.</span>
+    </div>
+
+    <div style="margin-top: 8px;">
+      <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--color-text-sub);">이 추천은 어땠나요?</div>
+      <div class="feedback-bar">
+        <button class="feedback-btn like" onclick="feedback('like')">👍 좋아요</button>
+        <button class="feedback-btn dislike" onclick="feedback('dislike')">👎 별로예요</button>
+      </div>
+    </div>
+
+    <div class="cta-wrap">
+      <button class="cta" onclick="toast('지도 앱 연동은 정식 버전에서 제공됩니다 🗺️')">길찾기 / 연락처</button>
+    </div>
+  </section>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ───────── State ───────── */
+  const state = {
+    mood: null,
+    budget: null,
+    currentScreen: 'landing',
+    history: ['landing'],
+  };
+
+  /* ───────── Data ───────── */
+  const moods = [
+    { id: 'hearty', emoji: '🍚', label: '든든한', desc: '배부르게 먹고 싶어요' },
+    { id: 'light', emoji: '🥗', label: '깔끔한', desc: '가볍고 상큼하게' },
+    { id: 'spicy', emoji: '🌶️', label: '매콤한', desc: '얼큰하게 스트레스 해소' },
+    { id: 'warm', emoji: '🍲', label: '따뜻한', desc: '국물이 있는 음식' },
+    { id: 'quick', emoji: '⚡', label: '빠르게', desc: '회의 전에 후딱' },
+    { id: 'any', emoji: '🎲', label: '상관없음', desc: 'AI가 골라주세요' },
+  ];
+
+  const budgets = [
+    { id: 'low', emoji: '💵', title: '1만원 미만', sub: '가볍게, 분식·김밥·라면' },
+    { id: 'mid', emoji: '💳', title: '1 ~ 1.5만원', sub: '적당하게, 한식·덮밥·국수' },
+    { id: 'high', emoji: '💎', title: '1.5만원 이상', sub: '든든하게, 정식·스테이크' },
+  ];
+
+  /* ───────── Mock Recommendations ─────────
+     실제 서비스에서는 Claude Haiku API 응답 */
+  const recoDB = {
+    'hearty-mid': [
+      { name: '판교 김밥천국', menu: '치즈돈까스 정식', distance: '도보 4분', price: '12,000원', emoji: '🍱', rating: '4.4', reason: '<b>든든한 식사</b>를 원하시는 점심, <b>1~1.5만원 예산</b>에 가장 잘 맞는 두툼한 돈까스 정식입니다. 평일 12시에도 회전이 빨라 대기가 짧아요.' },
+      { name: '본죽&비빔밥 판교점', menu: '육개장 비빔밥 세트', distance: '도보 6분', price: '11,500원', emoji: '🍲', rating: '4.3', reason: '<b>따뜻한 국물</b>과 비빔밥 조합으로 속이 든든해져요. 반찬 3종 포함이라 단백질·채소 균형도 좋습니다.' },
+      { name: '한솥도시락 테헤란점', menu: '제육쌈밥 정식', distance: '도보 3분', price: '9,800원', emoji: '🍚', rating: '4.2', reason: '<b>예산 하단</b>에서 최대 만족도. 제육볶음+쌈채소+국이 포함되어 <b>든든함 만족</b>입니다.' },
+    ],
+    'spicy-mid': [
+      { name: '홍대 매운짬뽕', menu: '사천 매운짬뽕', distance: '도보 5분', price: '11,000원', emoji: '🌶️', rating: '4.5', reason: '<b>매콤함 레벨 3단계</b>, 점심에 스트레스 풀기 딱 좋아요. 해물 토핑이 푸짐합니다.' },
+      { name: '엽기떡볶이 강남점', menu: '엽떡 오리지널+치즈', distance: '도보 7분', price: '13,000원', emoji: '🔥', rating: '4.3', reason: '매운맛에 <b>치즈로 밸런스</b>를 맞췄어요. 2인 공유 시 가성비 최고.' },
+      { name: '마라탕 우마라', menu: '소고기 마라탕 (중)', distance: '도보 4분', price: '12,500원', emoji: '🥘', rating: '4.4', reason: '<b>재료 골라담기</b>로 취향 맞춤 가능. 국물이 개운해 땀을 시원하게 빼줍니다.' },
+    ],
+    'light-mid': [
+      { name: '샐러디 강남역점', menu: '치킨 시저 샐러드', distance: '도보 2분', price: '10,500원', emoji: '🥗', rating: '4.5', reason: '<b>깔끔한 선호도</b>에 완벽. 단백질 28g, 칼로리 420kcal로 오후 업무에 부담 없어요.' },
+      { name: '오늘 연어', menu: '연어 포케 보울', distance: '도보 6분', price: '13,500원', emoji: '🍣', rating: '4.6', reason: '연어+아보카도+퀴노아 조합. <b>배는 부르되 무겁지 않은</b> 한 끼입니다.' },
+      { name: '샌드위치하우스', menu: '훈제연어 샌드위치', distance: '도보 3분', price: '9,800원', emoji: '🥪', rating: '4.3', reason: '빠르게 먹을 수 있고 <b>가벼운 식감</b>. 커피 포함 세트 +2,000원.' },
+    ],
+    'warm-mid': [
+      { name: '신의주 찹쌀순대', menu: '순대국밥', distance: '도보 5분', price: '10,000원', emoji: '🍜', rating: '4.5', reason: '<b>따뜻한 국물</b>의 정석. 환절기 몸을 따뜻하게 데우는 인기 메뉴입니다.' },
+      { name: '명동교자 판교점', menu: '칼국수 + 만두 세트', distance: '도보 6분', price: '12,500원', emoji: '🥟', rating: '4.4', reason: '진한 사골 칼국수에 <b>만두 3개 포함</b>. 속을 든든하게 채워줍니다.' },
+      { name: '청담 설렁탕', menu: '한우 설렁탕', distance: '도보 7분', price: '14,500원', emoji: '🍲', rating: '4.6', reason: '깊은 국물과 부드러운 고기. <b>예산 상단</b>이지만 만족도 최고.' },
+    ],
+  };
+
+  function getRecos() {
+    const key = `${state.mood}-${state.budget}`;
+    // 해당 조합이 없으면 hearty-mid 또는 가장 가까운 조합으로 폴백
+    return recoDB[key] || recoDB['hearty-mid'];
+  }
+
+  /* ───────── Render ───────── */
+  function renderMoods() {
+    const grid = document.getElementById('moodGrid');
+    grid.innerHTML = moods.map(m => `
+      <div class="chip" data-id="${m.id}" onclick="selectMood('${m.id}')">
+        <div class="chip-emoji">${m.emoji}</div>
+        <div class="chip-label">${m.label}</div>
+        <div class="chip-desc">${m.desc}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderBudgets() {
+    const list = document.getElementById('budgetList');
+    list.innerHTML = budgets.map(b => `
+      <div class="radio-item" data-id="${b.id}" onclick="selectBudget('${b.id}')">
+        <div class="radio-left">
+          <div class="radio-emoji">${b.emoji}</div>
+          <div>
+            <div class="radio-title">${b.title}</div>
+            <div class="radio-sub">${b.sub}</div>
+          </div>
+        </div>
+        <div class="radio-circle"></div>
+      </div>
+    `).join('');
+  }
+
+  function renderRecos() {
+    const recos = getRecos();
+    const list = document.getElementById('recoList');
+    const moodLabel = moods.find(m => m.id === state.mood)?.label || '—';
+    const budgetTitle = budgets.find(b => b.id === state.budget)?.title || '—';
+    document.getElementById('resultSummary').textContent =
+      `${moodLabel} 기분 · ${budgetTitle} 예산을 반영한 3가지`;
+
+    list.innerHTML = recos.map((r, i) => `
+      <div class="reco-card" onclick="showDetail(${i})">
+        <div class="reco-rank ${i === 0 ? 'first' : ''}">${i === 0 ? '🏆 AI 최우선' : `${i + 1}순위`}</div>
+        <div class="reco-header">
+          <div>
+            <div class="reco-title">${r.name}</div>
+            <div class="reco-menu">${r.menu}</div>
+          </div>
+          <div style="font-size: 36px;">${r.emoji}</div>
+        </div>
+        <div class="reco-meta">
+          <span class="meta-badge distance">📍 ${r.distance}</span>
+          <span class="meta-badge price">💰 ${r.price}</span>
+          <span class="meta-badge">⭐ ${r.rating}</span>
+        </div>
+        <div class="reco-reason">
+          <span class="reason-icon">✨</span>
+          <span class="reason-text">${r.reason}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  /* ───────── Interaction ───────── */
+  function selectMood(id) {
+    state.mood = id;
+    document.querySelectorAll('#moodGrid .chip').forEach(el => {
+      el.classList.toggle('selected', el.dataset.id === id);
+    });
+    document.getElementById('moodCta').disabled = false;
+  }
+
+  function selectBudget(id) {
+    state.budget = id;
+    document.querySelectorAll('#budgetList .radio-item').forEach(el => {
+      el.classList.toggle('selected', el.dataset.id === id);
+    });
+    document.getElementById('budgetCta').disabled = false;
+  }
+
+  function goto(screen) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+    document.getElementById(`screen-${screen}`).classList.remove('hidden');
+    state.currentScreen = screen;
+    state.history.push(screen);
+
+    // Step indicator
+    const indicator = document.getElementById('stepIndicator');
+    const stepMap = { mood: 1, budget: 2, loading: 3, result: 3, detail: 3 };
+    if (stepMap[screen]) {
+      indicator.style.display = 'flex';
+      indicator.querySelectorAll('.step-bar').forEach(bar => {
+        bar.classList.toggle('active', Number(bar.dataset.step) <= stepMap[screen]);
+      });
+    } else {
+      indicator.style.display = 'none';
+    }
+
+    // Back button
+    document.getElementById('btnBack').style.visibility =
+      state.history.length > 1 && screen !== 'landing' ? 'visible' : 'hidden';
+
+    // Loading auto-advance
+    if (screen === 'loading') {
+      setTimeout(() => {
+        renderRecos();
+        goto('result');
+      }, 2000);
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function back() {
+    state.history.pop();
+    const prev = state.history.pop() || 'landing';
+    goto(prev);
+  }
+
+  function showDetail(idx) {
+    const reco = getRecos()[idx];
+    document.getElementById('detailHero').textContent = reco.emoji;
+    document.getElementById('detailTitle').textContent = reco.name;
+    document.getElementById('detailMenu').textContent = reco.menu;
+    document.getElementById('detailDistance').textContent = reco.distance;
+    document.getElementById('detailPrice').textContent = reco.price;
+    document.getElementById('detailRating').textContent = reco.rating + ' / 5.0';
+    document.getElementById('detailReason').innerHTML = reco.reason;
+    goto('detail');
+  }
+
+  function regenerate() {
+    goto('loading');
+    toast('🔄 AI가 다른 메뉴를 다시 골라드릴게요');
+  }
+
+  function reset() {
+    state.mood = null;
+    state.budget = null;
+    state.history = ['landing'];
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('.radio-item').forEach(r => r.classList.remove('selected'));
+    document.getElementById('moodCta').disabled = true;
+    document.getElementById('budgetCta').disabled = true;
+    goto('landing');
+  }
+
+  function feedback(type) {
+    if (type === 'like') toast('👍 피드백 감사합니다! 다음 추천에 반영할게요');
+    else toast('👎 알겠습니다, 다음엔 더 나은 추천을 드릴게요');
+  }
+
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 2200);
+  }
+
+  /* ───────── Init ───────── */
+  document.getElementById('btnBack').addEventListener('click', back);
+  renderMoods();
+  renderBudgets();
+</script>
+
+</body>
+</html>
