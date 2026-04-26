@@ -1,0 +1,16 @@
+{
+  "name": "pptx",
+  "version": "1.0.0",
+  "description": "Claude Code Club 2026-04-27 talk slides",
+  "main": "generate.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "pptxgenjs": "^4.0.1"
+  }
+}
