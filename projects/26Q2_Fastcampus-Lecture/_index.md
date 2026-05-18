@@ -1,4 +1,4 @@
-# 26Q3_Fastcampus-Lecture — Document Map
+# 26Q2_Fastcampus-Lecture — Document Map
 
 > Status: Draft
 > Document Type: Index

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Doc Feedback Loop</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.11/dist/purify.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1>AI Doc Feedback Loop</h1>
+      <span id="base-dir" class="muted"></span>
+    </div>
+    <div class="topbar-right">
+      <span id="ai-badge" class="badge">AI: -</span>
+      <span id="current-file" class="muted">(파일을 선택하세요)</span>
+      <button id="btn-save-feedback" disabled>피드백 저장</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="tree-panel">
+      <div class="panel-header">
+        <span>문서 트리</span>
+        <button id="btn-refresh-tree" class="icon-btn" title="새로고침">↻</button>
+      </div>
+      <div id="file-tree" class="tree"></div>
+    </aside>
+
+    <section class="doc-panel">
+      <div class="doc-toolbar">
+        <label class="check">
+          <input type="checkbox" id="filter-high" checked />
+          <span>High-Level만 강조</span>
+        </label>
+        <span class="spacer"></span>
+        <span id="comment-count-pill" class="pill">코멘트 0</span>
+      </div>
+      <article id="doc-render" class="markdown-body">
+        <div class="empty">좌측에서 .md 파일을 선택하세요.</div>
+      </article>
+    </section>
+
+    <aside class="comments-panel">
+      <div class="panel-header">
+        <span>피드백</span>
+        <div class="tabs">
+          <button class="tab active" data-tab="list">목록</button>
+          <button class="tab" data-tab="new">새 코멘트</button>
+        </div>
+      </div>
+
+      <div id="tab-list" class="tab-content active">
+        <div class="filters">
+          <select id="filter-category">
+            <option value="">전체 카테고리</option>
+          </select>
+          <select id="filter-level">
+            <option value="">전체 계층</option>
+            <option value="High">High-Level Context</option>
+            <option value="Low">Low-Level Spec</option>
+          </select>
+        </div>
+        <div id="comment-list" class="comment-list"></div>
+      </div>
+
+      <div id="tab-new" class="tab-content">
+        <form id="comment-form" class="comment-form">
+          <label>
+            대상
+            <select id="comment-anchor">
+              <option value="">문서 전체</option>
+            </select>
+          </label>
+          <label>
+            카테고리
+            <div id="category-radio" class="category-radio"></div>
+          </label>
+          <div class="level-indicator">
+            계층: <span id="level-display">-</span>
+          </div>
+          <label>
+            작성자
+            <input type="text" id="comment-author" placeholder="이름" />
+          </label>
+          <label>
+            본문
+            <textarea id="comment-body" rows="5" placeholder="여기서 이 부분의 정책/컨텍스트/문제/해결점/기능/화면 의견을 작성합니다."></textarea>
+          </label>
+          <button type="submit" id="btn-submit-comment" disabled>코멘트 추가</button>
+        </form>
+      </div>
+    </aside>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <dialog id="save-result" class="result-dialog">
+    <h2>피드백 저장 완료</h2>
+    <div id="save-result-body"></div>
+    <button id="btn-close-result">닫기</button>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>

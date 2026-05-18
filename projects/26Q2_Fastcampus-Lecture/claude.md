@@ -1,4 +1,4 @@
-# Claude Context — 26Q3_Fastcampus-Lecture
+# Claude Context — 26Q2_Fastcampus-Lecture
 
 ## 프로젝트 목적
 패스트캠퍼스 "AI Native PM" 특강 자료 제작. 강의(30분) + 실습(60분) 구성.
