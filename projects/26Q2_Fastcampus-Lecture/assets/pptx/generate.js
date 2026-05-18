@@ -1313,7 +1313,255 @@ function addCard(s, x, y, w, h, opts = {}) {
   addAccentFooter(s, "자동화는 한 번에 하는 게 아닙니다. 반복되는 작업부터 하나씩 — 그게 PM의 생산성입니다.");
 }
 
-// ─── SLIDE 34: CLOSING (Dark) ───
+// ══════════════════════════════════════════════════════
+// CASE STUDY: AI DOC FEEDBACK LOOP (v02 additions, 2026-05-19)
+// 기존 페이지(SLIDE 1~33)는 건드리지 않고, Closing 앞에 3슬라이드 추가.
+// 컨텍스트: SLIDE 33 Lv.4 "PM 조직 통합 자동화"의 실제 사례
+// ══════════════════════════════════════════════════════
+
+// ─── SLIDE 34: CASE — AI DOC FEEDBACK LOOP (Why) ───
+{
+  const s = lightSlide();
+  addTitle(s, "Case: AI Doc Feedback Loop");
+  addSubtitle(s, "Lv.4 \"PM 조직 통합 자동화\"의 실사례 — AI가 빠르게 쓰는 만큼, 사람 피드백도 같은 속도로 다시 AI에게.");
+
+  const colW = 4.1, colY = 1.3, colH = 3.0;
+
+  // AS-IS
+  addCard(s, L.mx, colY, colW, colH, { bg: C.offWhite });
+  s.addText("AS-IS", {
+    x: L.mx + 0.15, y: colY + 0.1, w: colW - 0.3, h: 0.3,
+    fontSize: 11, fontFace: F.bold, color: C.midGray, margin: 0,
+  });
+  s.addText("피드백이 4채널에 분산", {
+    x: L.mx + 0.15, y: colY + 0.4, w: colW - 0.3, h: 0.4,
+    fontSize: 16, fontFace: F.title, color: C.black, margin: 0,
+  });
+  s.addText([
+    { text: "· Confluence 인라인 댓글\n", options: {} },
+    { text: "· GitHub PR Review\n", options: {} },
+    { text: "· Slack DM / 쓰레드\n", options: {} },
+    { text: "· 회의 노트\n\n", options: {} },
+    { text: "PM이 통합 정리에 ", options: { color: C.midGray } },
+    { text: "주 5~10시간", options: { color: C.accent, bold: true } },
+    { text: " 소요\n동일 피드백 ", options: { color: C.midGray } },
+    { text: "재발생률 30%+", options: { color: C.accent, bold: true } },
+  ], {
+    x: L.mx + 0.15, y: colY + 0.9, w: colW - 0.3, h: colH - 1.0,
+    fontSize: 12, fontFace: F.body, color: C.darkGray,
+    margin: 0, lineSpacingMultiple: 1.45, valign: "top",
+  });
+
+  // TO-BE
+  const tox = L.mx + colW + 0.4;
+  addCard(s, tox, colY, colW, colH, { bg: C.warmBg, leftAccent: C.accent });
+  s.addText("TO-BE", {
+    x: tox + 0.15, y: colY + 0.1, w: colW - 0.3, h: 0.3,
+    fontSize: 11, fontFace: F.bold, color: C.warmText, margin: 0,
+  });
+  s.addText("웹 한 화면 + 저장 한 번", {
+    x: tox + 0.15, y: colY + 0.4, w: colW - 0.3, h: 0.4,
+    fontSize: 16, fontFace: F.title, color: C.black, margin: 0,
+  });
+  s.addText([
+    { text: "· 좌·중·우 3패널 (트리 / MD / 코멘트)\n", options: {} },
+    { text: "· 6카테고리 × 2계층 자동 태깅\n", options: {} },
+    { text: "· '피드백 저장' 클릭 한 번에\n", options: {} },
+    { text: "    → 원본+이력 MD\n", options: { color: C.accent } },
+    { text: "    → AI 개선 요약 MD (카테고리별 3개)\n\n", options: { color: C.accent } },
+    { text: "사이클 타임 ", options: { color: C.warmText } },
+    { text: "1~2일 → 1~2시간", options: { color: C.accent, bold: true } },
+  ], {
+    x: tox + 0.15, y: colY + 0.9, w: colW - 0.3, h: colH - 1.0,
+    fontSize: 12, fontFace: F.body, color: C.darkGray,
+    margin: 0, lineSpacingMultiple: 1.45, valign: "top",
+  });
+
+  addAccentFooter(s, "AI가 빠르게 쓰는 만큼, 사람 피드백도 같은 속도로 다시 AI에게 흘려보내는 \"루프\"가 필요합니다.");
+}
+
+// ─── SLIDE 35: 6 CATEGORY × 2 LEVEL TAXONOMY ───
+{
+  const s = lightSlide();
+  addTitle(s, "분류 체계: 6카테고리 × 2계층");
+  addSubtitle(s, "모든 피드백·AI 개선안·점수 시각화가 이 분류 체계를 공유합니다.");
+
+  const catColor = {
+    "정책": "8B5CF6", "컨텍스트": "3B82F6", "문제": "EF4444",
+    "해결점": "10B981", "기능": "F97316", "화면": "06B6D4",
+  };
+  const catEn = {
+    "정책": "Policy", "컨텍스트": "Context", "문제": "Problem",
+    "해결점": "Solution", "기능": "Feature", "화면": "Screen",
+  };
+
+  const rows = [
+    { label: "High-Level Context", sub: "프로젝트·프로덕트 세계관 · 전략 판단", cats: ["정책", "컨텍스트", "문제"], y: 1.3 },
+    { label: "Low-Level Spec",     sub: "UX · 코드 구현을 위한 상세 정책",      cats: ["해결점", "기능", "화면"],   y: 2.6 },
+  ];
+
+  rows.forEach(row => {
+    s.addText(row.label, {
+      x: L.mx, y: row.y, w: 2.5, h: 0.4,
+      fontSize: 13, fontFace: F.title, color: C.black, margin: 0,
+    });
+    s.addText(row.sub, {
+      x: L.mx, y: row.y + 0.42, w: 2.5, h: 0.5,
+      fontSize: L.captionSize, fontFace: F.body, color: C.midGray,
+      margin: 0, lineSpacingMultiple: 1.3,
+    });
+    row.cats.forEach((cat, i) => {
+      const cx = 3.0 + i * 2.1, cy = row.y, cw = 2.0, ch = 1.05;
+      s.addShape(pres.shapes.RECTANGLE, {
+        x: cx, y: cy, w: cw, h: ch, fill: { color: catColor[cat] },
+      });
+      s.addText(cat, {
+        x: cx, y: cy + 0.18, w: cw, h: 0.4,
+        fontSize: 18, fontFace: F.title, color: C.white,
+        align: "center", margin: 0,
+      });
+      s.addText(catEn[cat], {
+        x: cx, y: cy + 0.62, w: cw, h: 0.3,
+        fontSize: L.captionSize, fontFace: F.body, color: C.white,
+        align: "center", margin: 0,
+      });
+    });
+  });
+
+  // Bottom: 산출되는 두 종류 MD
+  const oy = 3.95;
+  s.addText("📄  피드백 저장 시 산출되는 두 종류 MD", {
+    x: L.mx, y: oy, w: L.cw, h: 0.35,
+    fontSize: 13, fontFace: F.title, color: C.black, margin: 0,
+  });
+  addCard(s, L.mx, oy + 0.4, 4.3, 0.62, { bg: C.offWhite, leftAccent: "1F883D" });
+  s.addText([
+    { text: "원본 + 피드백 이력 MD\n", options: { fontSize: 12, bold: true, color: C.black, fontFace: F.bold } },
+    { text: "카테고리별 시각·작성자·본문 누적 테이블", options: { fontSize: L.captionSize, color: C.midGray } },
+  ], {
+    x: L.mx + 0.18, y: oy + 0.42, w: 4.0, h: 0.58,
+    fontFace: F.body, margin: 0, lineSpacingMultiple: 1.25, valign: "middle",
+  });
+  addCard(s, L.mx + 4.45, oy + 0.4, 4.15, 0.62, { bg: C.warmBg, leftAccent: C.accent });
+  s.addText([
+    { text: "AI 개선 요약 MD\n", options: { fontSize: 12, bold: true, color: C.warmText, fontFace: F.bold } },
+    { text: "카테고리별 핵심 정리 1줄 + 개선안 3개", options: { fontSize: L.captionSize, color: C.warmText } },
+  ], {
+    x: L.mx + 4.63, y: oy + 0.42, w: 3.9, h: 0.58,
+    fontFace: F.body, margin: 0, lineSpacingMultiple: 1.25, valign: "middle",
+  });
+
+  addFooter(s, "AI 추천 원칙: 카테고리별 3개 (피드백이 있으면 그대로 정리, 없으면 AI 아이디어 3개)");
+}
+
+// ─── SLIDE 36: LOCAL-FIRST WEB APP DEMO ───
+{
+  const s = lightSlide();
+  addTitle(s, "데모: Local-first 웹 앱");
+  addSubtitle(s, "Express + Vanilla JS · Claude/Codex CLI 자동 연동 · MD 호환 (GitHub/VS Code에서도 깨짐 없음)");
+
+  const py = 1.3, ph = 2.35;
+
+  // Left — Tree
+  addCard(s, L.mx, py, 1.6, ph, { bg: C.offWhite });
+  s.addText("문서 트리", {
+    x: L.mx + 0.1, y: py + 0.08, w: 1.4, h: 0.28,
+    fontSize: 10, fontFace: F.bold, color: C.midGray, margin: 0,
+  });
+  s.addText("📁 projects\n  📁 26Q2_AI-Doc-...\n    📁 prd\n      📄 PRD.md\n      📄 2pager.md\n    📁 specs\n  📁 26Q2_Fastcampus\n📁 docs", {
+    x: L.mx + 0.1, y: py + 0.4, w: 1.45, h: 1.9,
+    fontSize: 8, fontFace: F.code, color: C.darkGray, margin: 0, lineSpacingMultiple: 1.45,
+  });
+
+  // Center — MD render
+  const cx = L.mx + 1.7;
+  s.addShape(pres.shapes.RECTANGLE, {
+    x: cx, y: py, w: 4.6, h: ph, fill: { color: C.white },
+    line: { color: C.lightGray, width: 1 },
+  });
+  s.addText("# AI Doc Feedback Loop PRD", {
+    x: cx + 0.15, y: py + 0.12, w: 4.3, h: 0.32,
+    fontSize: 13, fontFace: F.title, color: C.black, margin: 0,
+  });
+  s.addText("## §3. Problem Definition  💬 2", {
+    x: cx + 0.15, y: py + 0.55, w: 4.3, h: 0.28,
+    fontSize: 11, fontFace: F.bold, color: C.black, margin: 0,
+  });
+  s.addText("피드백 4채널 분산 → PM 주 5~10h 수작업. AI 초안 30분 vs 반영본 3시간+ ...", {
+    x: cx + 0.15, y: py + 0.88, w: 4.3, h: 0.5,
+    fontSize: 9, fontFace: F.body, color: C.midGray, margin: 0, lineSpacingMultiple: 1.35,
+  });
+  s.addText("## §4. Solution Proposed  💬 4", {
+    x: cx + 0.15, y: py + 1.45, w: 4.3, h: 0.28,
+    fontSize: 11, fontFace: F.bold, color: C.black, margin: 0,
+  });
+  s.addText("저장 한 번에 (원본+이력) + (AI 개선안 3개) 두 MD 자동 산출 ...", {
+    x: cx + 0.15, y: py + 1.78, w: 4.3, h: 0.5,
+    fontSize: 9, fontFace: F.body, color: C.midGray, margin: 0, lineSpacingMultiple: 1.35,
+  });
+
+  // Right — Comments
+  const rx = cx + 4.7;
+  addCard(s, rx, py, 2.3, ph, { bg: C.offWhite });
+  s.addText("피드백 (4)", {
+    x: rx + 0.1, y: py + 0.08, w: 2.1, h: 0.28,
+    fontSize: 10, fontFace: F.bold, color: C.midGray, margin: 0,
+  });
+  const mini = [
+    { cat: "정책", color: "8B5CF6", who: "Designer", body: "PII 처리 정책 명시 필요" },
+    { cat: "문제", color: "EF4444", who: "EM",       body: "P2 영향 수치 근거는?" },
+    { cat: "기능", color: "F97316", who: "PM",       body: "F-04 자동/수동 토글" },
+    { cat: "화면", color: "06B6D4", who: "Designer", body: "우측 패널 폭 340 → 380?" },
+  ];
+  mini.forEach((m, i) => {
+    const my = py + 0.42 + i * 0.46;
+    s.addShape(pres.shapes.RECTANGLE, {
+      x: rx + 0.1, y: my, w: 2.1, h: 0.4,
+      fill: { color: C.white }, line: { color: C.lightGray, width: 0.5 },
+    });
+    s.addShape(pres.shapes.RECTANGLE, {
+      x: rx + 0.1, y: my, w: 0.06, h: 0.4, fill: { color: m.color },
+    });
+    s.addText(m.cat, {
+      x: rx + 0.22, y: my + 0.03, w: 0.55, h: 0.18,
+      fontSize: 8, fontFace: F.bold, color: m.color, margin: 0,
+    });
+    s.addText(m.who, {
+      x: rx + 0.8, y: my + 0.03, w: 1.3, h: 0.18,
+      fontSize: 8, fontFace: F.body, color: C.midGray, align: "right", margin: 0,
+    });
+    s.addText(m.body, {
+      x: rx + 0.22, y: my + 0.2, w: 1.95, h: 0.18,
+      fontSize: 8, fontFace: F.body, color: C.darkGray, margin: 0,
+    });
+  });
+
+  // Workflow strip
+  const wy = py + ph + 0.2;
+  const steps = [
+    { icon: "①", text: "코멘트\n(6카테고리)" },
+    { icon: "②", text: "[피드백 저장]\n클릭" },
+    { icon: "③", text: "Claude/Codex CLI\n자동 호출" },
+    { icon: "④", text: "2종 MD 생성\n(원본+이력 / 개선안 3개)" },
+    { icon: "⑤", text: "Claude Desktop에서\n다음 리비전" },
+  ];
+  const sw = L.cw / steps.length;
+  steps.forEach((st, i) => {
+    const sx = L.mx + i * sw;
+    s.addText(st.icon, {
+      x: sx, y: wy, w: sw, h: 0.3,
+      fontSize: 14, fontFace: F.title, color: C.accent, align: "center", margin: 0,
+    });
+    s.addText(st.text, {
+      x: sx, y: wy + 0.32, w: sw, h: 0.55,
+      fontSize: 9, fontFace: F.body, color: C.darkGray, align: "center", margin: 0, lineSpacingMultiple: 1.3,
+    });
+  });
+
+  addFooter(s, "Code: projects/26Q2_AI-Doc-Feedback-Loop/app  ·  cd app && npm install && npm start  ·  http://localhost:5174");
+}
+
+// ─── SLIDE 37: CLOSING (Dark) ───
 {
   const s = darkSlide();
   s.addText("오늘 여러분이 만든 것", {
@@ -1361,7 +1609,9 @@ function addCard(s, x, y, w, h, opts = {}) {
 // ══════════════════════════════════════════════════════
 // GENERATE
 // ══════════════════════════════════════════════════════
-const out = "/Users/sungjae-cha/Downloads/ai-native-pm/projects/26Q3_Fastcampus-Lecture/assets/pptx/ai-native-pm-lecture.pptx";
+const path = require("path");
+const defaultOut = path.join(__dirname, "ai-native-pm-lecture.pptx");
+const out = process.env.OUT || defaultOut;
 pres.writeFile({ fileName: out })
   .then(() => console.log("Created: " + out + " (" + pres.slides.length + " slides)"))
   .catch(e => console.error(e));

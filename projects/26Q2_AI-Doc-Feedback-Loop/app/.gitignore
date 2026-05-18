@@ -1,0 +1,4 @@
+node_modules/
+data/comments.json
+data/*.bak
+.DS_Store
