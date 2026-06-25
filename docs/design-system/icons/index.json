@@ -1,0 +1,20 @@
+{
+  "$description": "Icon manifest — AI-Native PM Design System. Monochrome 24x24 stroke icons, currentColor. Use inline or via <img>.",
+  "style": { "viewBox": "0 0 24 24", "stroke": "currentColor", "strokeWidth": 1.6, "fill": "none" },
+  "icons": {
+    "mood-happy":   { "file": "mood-happy.svg",   "group": "mood",   "label": "기분좋음" },
+    "mood-tired":   { "file": "mood-tired.svg",    "group": "mood",   "label": "지침" },
+    "mood-spicy":   { "file": "mood-spicy.svg",    "group": "mood",   "label": "매운게땡김" },
+    "mood-light":   { "file": "mood-light.svg",    "group": "mood",   "label": "가볍게" },
+    "mood-special": { "file": "mood-special.svg",  "group": "mood",   "label": "특별한날" },
+    "budget":       { "file": "budget.svg",        "group": "input",  "label": "예산" },
+    "location":     { "file": "location.svg",      "group": "input",  "label": "위치" },
+    "star":         { "file": "star.svg",          "group": "status", "label": "인기" },
+    "clock":        { "file": "clock.svg",         "group": "status", "label": "시간" },
+    "walk":         { "file": "walk.svg",          "group": "status", "label": "도보거리" },
+    "arrow-right":  { "file": "arrow-right.svg",   "group": "action", "label": "다음" },
+    "check":        { "file": "check.svg",         "group": "action", "label": "수락" },
+    "refresh":      { "file": "refresh.svg",       "group": "action", "label": "다시추천" },
+    "close":        { "file": "close.svg",         "group": "action", "label": "거절/닫기" }
+  }
+}

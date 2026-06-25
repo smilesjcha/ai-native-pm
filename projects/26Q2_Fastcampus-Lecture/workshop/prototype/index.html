@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>오늘의 점심 메이트 — Prototype</title>
+<style>
+  :root{
+    --action:#0066cc; --focus:#0071e3; --sky:#2997ff;
+    --ink:#1d1d1f; --ink80:#333; --ink48:#7a7a7a;
+    --canvas:#fff; --parchment:#f5f5f7; --pearl:#fafafc; --tile:#272729;
+    --hair:#e0e0e0; --divider:#f0f0f0;
+    --font-d:"SF Pro Display",system-ui,-apple-system,Inter,sans-serif;
+    --font-t:"SF Pro Text",system-ui,-apple-system,Inter,sans-serif;
+    --r-sm:8px; --r-md:11px; --r-lg:18px; --r-pill:9999px;
+    --shadow-product:3px 5px 30px rgba(0,0,0,.22);
+  }
+  *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{font-family:var(--font-t);background:radial-gradient(1200px 800px at 50% -10%, #2a2a2e, #161618);
+    display:grid;place-items:center;color:var(--ink);}
+  /* device */
+  .device{width:390px;height:844px;background:#000;border-radius:54px;padding:11px;position:relative;
+    box-shadow:0 40px 120px rgba(0,0,0,.6), inset 0 0 0 2px #2c2c2e;}
+  .viewport{width:100%;height:100%;background:var(--canvas);border-radius:44px;overflow:hidden;position:relative;}
+  .notch{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:128px;height:30px;background:#000;border-radius:18px;z-index:30;}
+  .status{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:flex-end;justify-content:space-between;
+    padding:0 30px 8px;font-size:14px;font-weight:600;z-index:20;color:var(--ink);pointer-events:none;}
+  .status.dark{color:#fff;}
+
+  /* screen stack */
+  .screen{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;visibility:hidden;
+    transform:translateX(24px);transition:opacity .42s ease, transform .42s cubic-bezier(.4,0,.2,1);background:var(--canvas);}
+  .screen.active{opacity:1;visibility:visible;transform:none;z-index:10;}
+  .screen.dark{background:var(--tile);color:#fff;}
+  .body{flex:1;overflow:hidden;padding:64px 26px 26px;display:flex;flex-direction:column;}
+  .topnav{height:54px;}
+
+  .step{font-size:13px;color:var(--ink48);}
+  h1.t{font-family:var(--font-d);font-weight:600;letter-spacing:-.6px;line-height:1.08;font-size:32px;margin:8px 0 22px;}
+  h1.t.sm{font-size:26px;}
+  .spacer{flex:1;}
+
+  .btn{display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font-t);font-size:17px;
+    border:none;cursor:pointer;transition:transform .12s ease, background .15s ease;width:100%;}
+  .btn:active{transform:scale(.96);}
+  .btn-primary{background:var(--action);color:#fff;border-radius:var(--r-pill);padding:16px;}
+  .btn-primary[disabled]{background:#c7d6e8;cursor:default;}
+  .btn-ghost{background:transparent;color:var(--action);border:1px solid var(--action);border-radius:var(--r-pill);padding:15px;}
+  .btn-row{display:flex;gap:10px;}
+  .btn-row .btn{width:auto;}
+  .btn-icon{width:56px;flex:0 0 56px;border-radius:var(--r-pill);border:1px solid var(--hair);background:#fff;color:var(--ink);font-size:20px;}
+
+  /* mood grid */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+  .chip{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#fff;
+    border:1px solid var(--hair);border-radius:var(--r-lg);padding:20px 10px;cursor:pointer;
+    transition:transform .12s ease, border .15s ease;font-size:15px;}
+  .chip:active{transform:scale(.97);}
+  .chip .emo{font-size:30px;}
+  .chip.sel{border:2px solid var(--focus);background:#f7faff;}
+  .opt{border:1px solid var(--hair);border-radius:var(--r-pill);padding:16px;text-align:center;font-size:16px;cursor:pointer;
+    transition:transform .12s ease, border .15s ease;background:#fff;}
+  .opt:active{transform:scale(.98);}
+  .opt.sel{border:2px solid var(--focus);font-weight:600;background:#f7faff;}
+  .catchip{border:1px solid var(--hair);border-radius:var(--r-pill);padding:12px;text-align:center;font-size:14px;cursor:pointer;background:#fff;transition:border .15s,transform .12s;}
+  .catchip:active{transform:scale(.97);}
+  .catchip.sel{border:2px solid var(--focus);font-weight:600;background:#f7faff;}
+
+  /* splash */
+  .center{align-items:center;text-align:center;justify-content:center;gap:16px;}
+  .appicon{width:108px;height:108px;border-radius:28px;background:#fff;display:grid;place-items:center;box-shadow:var(--shadow-product);}
+  .appicon .bowl{width:64px;height:36px;background:var(--action);border-radius:0 0 32px 32px;position:relative;}
+  .appicon .bowl::before{content:"";position:absolute;top:-7px;left:8px;right:8px;height:14px;background:var(--focus);border-radius:50%;}
+
+  /* loading */
+  .spinner{width:56px;height:56px;border-radius:50%;border:5px solid rgba(255,255,255,.2);border-top-color:#fff;animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .chiprow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+  .tagpill{font-size:13px;color:var(--sky);border:1px solid rgba(41,151,255,.5);padding:6px 12px;border-radius:var(--r-pill);}
+
+  /* results */
+  .subnav{height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;
+    background:rgba(245,245,247,.82);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--divider);
+    font-family:var(--font-d);font-weight:600;font-size:19px;}
+  .subnav .re{font-family:var(--font-t);font-size:15px;color:var(--action);font-weight:400;cursor:pointer;}
+  .cards{padding:18px 22px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;flex:1;background:var(--parchment);}
+  .card{background:#fff;border:1px solid var(--hair);border-radius:var(--r-lg);padding:14px;cursor:pointer;transition:transform .12s ease;}
+  .card:active{transform:scale(.99);}
+  .card .img{height:120px;border-radius:var(--r-sm);margin-bottom:12px;}
+  .c1 .img{background:linear-gradient(135deg,#fde68a,#fca5a5);}
+  .c2 .img{background:linear-gradient(135deg,#bbf7d0,#86efac);}
+  .c3 .img{background:linear-gradient(135deg,#bfdbfe,#a5b4fc);}
+  .card .nm{font-size:18px;font-weight:600;letter-spacing:-.3px;}
+  .card .meta{font-size:14px;color:var(--ink48);margin:3px 0 6px;}
+  .card .why{font-size:14px;color:var(--ink80);}
+  .card .cat{font-size:13px;color:var(--ink48);font-weight:400;}
+
+  /* detail */
+  .map{height:230px;background:
+     linear-gradient(0deg,rgba(0,102,204,.06),rgba(0,102,204,.06)),
+     repeating-linear-gradient(0deg,#eef0f3 0 26px,#e6e9ee 26px 28px),
+     repeating-linear-gradient(90deg,#eef0f3 0 26px,#e6e9ee 26px 28px);position:relative;}
+  .map .pin{position:absolute;left:50%;top:50%;transform:translate(-50%,-100%);font-size:34px;color:var(--action);}
+  .detail-body{padding:22px 26px;display:flex;flex-direction:column;flex:1;}
+  .toast{position:absolute;left:24px;right:24px;bottom:30px;background:var(--ink);color:#fff;border-radius:var(--r-md);
+    padding:14px 18px;font-size:15px;display:flex;align-items:center;gap:10px;opacity:0;transform:translateY(12px);
+    transition:opacity .3s,transform .3s;z-index:25;}
+  .toast.show{opacity:1;transform:none;}
+
+  /* progress dots */
+  .dots{display:flex;gap:6px;justify-content:center;padding:0 0 6px;}
+  .dots i{width:7px;height:7px;border-radius:50%;background:var(--hair);transition:background .2s,width .2s;}
+  .dots i.on{background:var(--action);width:20px;border-radius:4px;}
+
+  /* fake cursor for demo */
+  #cursor{position:absolute;width:26px;height:26px;left:-60px;top:-60px;z-index:999;pointer-events:none;
+    transition:left .7s cubic-bezier(.5,0,.2,1), top .7s cubic-bezier(.5,0,.2,1);filter:drop-shadow(0 3px 5px rgba(0,0,0,.4));}
+  #cursor.click .ring{transform:scale(1);opacity:1;}
+  #cursor .ring{position:absolute;left:-8px;top:-8px;width:42px;height:42px;border-radius:50%;background:rgba(0,102,204,.3);
+    transform:scale(.2);opacity:0;transition:transform .35s ease, opacity .35s ease;}
+  .demo-badge{position:absolute;top:18px;left:18px;z-index:998;background:rgba(0,0,0,.6);color:#fff;font-size:11px;
+    padding:5px 10px;border-radius:var(--r-pill);font-family:var(--font-t);display:none;}
+  body.demo .demo-badge{display:block;}
+</style>
+</head>
+<body>
+<div class="device" id="device">
+  <div class="notch"></div>
+  <div class="viewport" id="viewport">
+    <div class="demo-badge">▶ AUTO DEMO</div>
+
+    <!-- 01 splash -->
+    <section class="screen dark active" data-screen="splash">
+      <div class="status dark"><span>9:41</span><span>5G ▮</span></div>
+      <div class="body center" style="background:var(--parchment);color:var(--ink);">
+        <div class="appicon"><div class="bowl"></div></div>
+        <h1 class="t" style="margin-top:24px;">오늘의<br/>점심 메이트</h1>
+        <div style="color:var(--ink48);font-size:16px;margin-top:-8px;">기분으로 고르는 AI 점심 추천</div>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" data-go="loc">시작하기</button>
+      </div>
+    </section>
+
+    <!-- 02 location -->
+    <section class="screen" data-screen="loc">
+      <div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="body center">
+        <div style="font-size:54px;color:var(--action);">◉</div>
+        <h1 class="t sm">근처 식당을<br/>찾을게요</h1>
+        <div style="color:var(--ink48);font-size:16px;margin-top:-10px;line-height:1.5;">현재 위치 반경 500m 내에서<br/>걸어갈 수 있는 식당만 추천해요</div>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" data-go="mood" style="margin-bottom:10px;">위치 허용하기</button>
+        <button class="btn btn-ghost" data-go="mood">주소 직접 입력</button>
+      </div>
+    </section>
+
+    <!-- 03 mood -->
+    <section class="screen" data-screen="mood">
+      <div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="body">
+        <div class="step">1 / 3 단계</div>
+        <h1 class="t">지금 기분이<br/>어떠세요?</h1>
+        <div class="grid2">
+          <div class="chip" data-mood="기분좋음"><span class="emo">😊</span>기분좋음</div>
+          <div class="chip" data-mood="지침"><span class="emo">😫</span>지침</div>
+          <div class="chip" data-mood="매운게 땡김"><span class="emo">🔥</span>매운게땡김</div>
+          <div class="chip" data-mood="가볍게"><span class="emo">🥗</span>가볍게</div>
+          <div class="chip" style="grid-column:span 2;" data-mood="특별한 날"><span class="emo">🎉</span>특별한 날</div>
+        </div>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" data-go="budget" disabled data-needs="mood">다음</button>
+      </div>
+    </section>
+
+    <!-- 04 budget -->
+    <section class="screen" data-screen="budget">
+      <div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="body">
+        <div class="step">2 / 3 단계</div>
+        <h1 class="t">예산은<br/>얼마인가요?</h1>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="opt" data-budget="8천원 이하">₩ 8,000원 이하</div>
+          <div class="opt" data-budget="8천~1.5만원">₩ 8,000 ~ 15,000원</div>
+          <div class="opt" data-budget="1.5만원 이상">₩ 15,000원 이상</div>
+        </div>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" data-go="pref" disabled data-needs="budget">다음</button>
+      </div>
+    </section>
+
+    <!-- 05 preference -->
+    <section class="screen" data-screen="pref">
+      <div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="body">
+        <div class="step">3 / 3 단계 · 선택</div>
+        <h1 class="t">선호하는<br/>카테고리는?</h1>
+        <div class="grid3">
+          <div class="catchip" data-cat>한식</div><div class="catchip" data-cat>일식</div><div class="catchip" data-cat>중식</div>
+          <div class="catchip" data-cat>양식</div><div class="catchip" data-cat>분식</div><div class="catchip" data-cat>아시안</div>
+        </div>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" data-go="loading">추천받기 ✨</button>
+      </div>
+    </section>
+
+    <!-- 06 loading -->
+    <section class="screen dark" data-screen="loading">
+      <div class="status dark"><span>9:41</span><span>5G ▮</span></div>
+      <div class="body center">
+        <div class="spinner"></div>
+        <h1 class="t sm" style="color:#fff;margin-top:20px;">AI가 메뉴를<br/>고르고 있어요</h1>
+        <div class="chiprow" id="ctx-tags"></div>
+      </div>
+    </section>
+
+    <!-- 07 results -->
+    <section class="screen" data-screen="results">
+      <div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="subnav"><span>추천 결과</span><span class="re" data-go="loading">다시 ↻</span></div>
+      <div class="cards">
+        <div class="card c1" data-go="detail">
+          <div class="img"></div>
+          <div class="nm">제육덮밥 <span class="cat">· 한식</span></div>
+          <div class="meta">맛있는집 · 도보 4분 · 8,500원</div>
+          <div class="why">“지친 오후엔 든든한 제육 한 그릇 어때요?”</div>
+        </div>
+        <div class="card c2" data-go="detail">
+          <div class="img"></div>
+          <div class="nm">연어 포케 <span class="cat">· 샐러드</span></div>
+          <div class="meta">포케데이 · 도보 6분 · 12,000원</div>
+          <div class="why">“가볍게 먹고 싶을 때 단백질 가득 포케볼”</div>
+        </div>
+        <div class="card c3" data-go="detail">
+          <div class="img"></div>
+          <div class="nm">우삼겹 우동 <span class="cat">· 일식</span></div>
+          <div class="meta">멘야 · 도보 3분 · 9,500원</div>
+          <div class="why">“따뜻한 국물로 기분 전환하기 좋아요”</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 detail -->
+    <section class="screen" data-screen="detail">
+      <div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="map"><div class="pin">◉</div></div>
+      <div class="detail-body">
+        <h1 class="t sm" style="margin:0 0 4px;">제육덮밥</h1>
+        <div style="color:var(--ink48);font-size:15px;">맛있는집 · ★ 4.6 · 도보 4분 (320m)</div>
+        <div style="color:var(--ink80);font-size:16px;margin-top:10px;">8,500원 · 한식 · 점심 영업중</div>
+        <div style="background:var(--parchment);border-radius:var(--r-md);padding:14px;margin-top:16px;font-size:15px;color:var(--ink80);">
+          “기분좋은 날 · 8–15천원 · 강남 500m 조건에 딱 맞는 메뉴예요.”
+        </div>
+        <div class="spacer"></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" data-accept style="flex:1;">수락 · 길찾기</button>
+          <button class="btn btn-icon" data-go="results">✕</button>
+          <button class="btn btn-icon" data-go="results">↻</button>
+        </div>
+      </div>
+      <div class="toast" id="toast">✓ 맛있는집으로 안내를 시작합니다</div>
+    </section>
+
+  </div>
+</div>
+
+<svg id="cursor" viewBox="0 0 24 24"><div class="ring"></div></svg>
+<div id="cursor-wrap"></div>
+
+<script>
+const V = document.getElementById('viewport');
+const state = { mood:null, budget:null, cats:[] };
+
+function show(id){
+  V.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active', s.dataset.screen===id));
+  if(id==='loading'){
+    document.getElementById('ctx-tags').innerHTML =
+      [state.mood, state.budget, '강남 500m'].filter(Boolean).map(t=>`<span class="tagpill">${t}</span>`).join('');
+    clearTimeout(show._t); show._t = setTimeout(()=>show('results'), 1700);
+  }
+}
+function refreshNext(screen){
+  const btn = V.querySelector(`.screen[data-screen="${screen}"] .btn[data-needs]`);
+  if(!btn) return;
+  const need = btn.dataset.needs;
+  btn.disabled = !state[need];
+}
+
+V.addEventListener('click', (e)=>{
+  const go = e.target.closest('[data-go]');
+  const mood = e.target.closest('[data-mood]');
+  const bud = e.target.closest('[data-budget]');
+  const cat = e.target.closest('[data-cat]');
+  const accept = e.target.closest('[data-accept]');
+  if(mood){
+    state.mood = mood.dataset.mood;
+    mood.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));
+    mood.classList.add('sel'); refreshNext('mood'); return;
+  }
+  if(bud){
+    state.budget = bud.dataset.budget;
+    bud.parentElement.querySelectorAll('.opt').forEach(c=>c.classList.remove('sel'));
+    bud.classList.add('sel'); refreshNext('budget'); return;
+  }
+  if(cat){ cat.classList.toggle('sel'); return; }
+  if(accept){
+    const t = document.getElementById('toast'); t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 2200); return;
+  }
+  if(go && !go.disabled){ show(go.dataset.go); }
+});
+
+/* ───────── AUTO DEMO (for video) ───────── */
+function demo(){
+  document.body.classList.add('demo');
+  const cursor = document.getElementById('cursor');
+  cursor.innerHTML = '<polygon points="3,2 3,20 8,15 12,21 14,20 10,14 17,14" fill="#111" stroke="#fff" stroke-width="1.2"/><circle class="ring" cx="3" cy="2" r="0"/>';
+  const ring = document.createElement('div'); ring.className='ring';
+  const sleep = ms=>new Promise(r=>setTimeout(r,ms));
+  const vpRect = ()=>V.getBoundingClientRect();
+
+  async function moveTo(sel, nth=0){
+    const el = V.querySelectorAll(sel)[nth];
+    if(!el) return null;
+    const r = el.getBoundingClientRect();
+    cursor.style.left = (r.left + r.width/2) + 'px';
+    cursor.style.top  = (r.top + r.height/2) + 'px';
+    await sleep(760);
+    return el;
+  }
+  async function click(sel, nth=0){
+    const el = await moveTo(sel, nth);
+    if(!el) return;
+    cursor.classList.add('click');
+    await sleep(120);
+    el.dispatchEvent(new MouseEvent('click', {bubbles:true}));
+    await sleep(260);
+    cursor.classList.remove('click');
+    await sleep(360);
+  }
+
+  (async ()=>{
+    cursor.style.left='50%'; cursor.style.top='90%';
+    await sleep(900);
+    await click('[data-go="loc"]');                 // splash → loc
+    await sleep(500);
+    await click('[data-go="mood"]', 0);             // 위치 허용 → mood
+    await sleep(500);
+    await click('[data-mood="기분좋음"]');           // pick mood
+    await sleep(350);
+    await click('.screen[data-screen="mood"] [data-go="budget"]');
+    await sleep(400);
+    await click('[data-budget="8천~1.5만원"]');      // pick budget
+    await sleep(350);
+    await click('.screen[data-screen="budget"] [data-go="pref"]');
+    await sleep(400);
+    await click('[data-cat]', 0);                   // 한식
+    await click('[data-cat]', 4);                   // 분식
+    await sleep(300);
+    await click('[data-go="loading"]');             // → loading → (auto) results
+    await sleep(2600);                              // wait loading→results
+    await moveTo('.card', 0); await sleep(300);
+    await click('.card.c1');                        // open detail
+    await sleep(700);
+    await click('[data-accept]');                   // accept
+    await sleep(2400);
+    // loop badge end
+    document.querySelector('.demo-badge').textContent = '✓ DEMO END';
+    await sleep(900);
+    window.__DEMO_DONE__ = true;
+  })();
+}
+if(new URLSearchParams(location.search).get('demo')==='1'){ window.addEventListener('load', ()=>setTimeout(demo, 400)); }
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 72" role="img" aria-label="오늘의 점심 메이트">
+  <!-- bowl mark -->
+  <g transform="translate(36,38)">
+    <path d="M-26 -2h52a26 26 0 0 1-52 0z" fill="#0066cc"/>
+    <ellipse cx="0" cy="-2" rx="26" ry="6" fill="#0071e3"/>
+    <g stroke="#1d1d1f" stroke-width="2.4" stroke-linecap="round" fill="none" opacity="0.85">
+      <path d="M-9 -14c-3 -4 3 -7 0 -12"/>
+      <path d="M0 -16c-3 -4 3 -7 0 -12"/>
+      <path d="M9 -14c-3 -4 3 -7 0 -12"/>
+    </g>
+  </g>
+  <!-- wordmark -->
+  <text x="78" y="46" font-family="'SF Pro Display', system-ui, -apple-system, Inter, sans-serif"
+        font-size="28" font-weight="600" letter-spacing="-0.5" fill="#1d1d1f">오늘의 점심 메이트</text>
+</svg>

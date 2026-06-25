@@ -1,0 +1,32 @@
+/* Base typography & surfaces — AI-Native PM Design System
+   Requires tokens.css loaded first. */
+
+body {
+  font-family: var(--font-text);
+  font-size: var(--type-body-size);
+  font-weight: var(--weight-regular);
+  line-height: var(--type-body-lh);
+  letter-spacing: var(--type-body-ls);
+  color: var(--color-ink);
+  background: var(--color-canvas);
+}
+
+/* Display headlines: SF Pro Display 600 + negative tracking ("Apple tight") */
+.ds-hero      { font-family: var(--font-display); font-size: var(--type-hero-size); font-weight: var(--weight-semibold); line-height: var(--type-hero-lh); letter-spacing: var(--type-hero-ls); }
+.ds-display-lg{ font-family: var(--font-display); font-size: var(--type-display-lg-size); font-weight: var(--weight-semibold); line-height: var(--type-display-lg-lh); letter-spacing: var(--type-display-lg-ls); }
+.ds-display-md{ font-family: var(--font-text); font-size: var(--type-display-md-size); font-weight: var(--weight-semibold); line-height: var(--type-display-md-lh); letter-spacing: var(--type-display-md-ls); }
+.ds-lead      { font-family: var(--font-display); font-size: var(--type-lead-size); font-weight: var(--weight-regular); line-height: var(--type-lead-lh); letter-spacing: var(--type-lead-ls); }
+.ds-lead-airy { font-family: var(--font-text); font-size: var(--type-lead-airy-size); font-weight: var(--weight-light); line-height: var(--type-lead-airy-lh); }
+.ds-tagline   { font-family: var(--font-display); font-size: var(--type-tagline-size); font-weight: var(--weight-semibold); line-height: var(--type-tagline-lh); letter-spacing: var(--type-tagline-ls); }
+.ds-body-strong { font-size: var(--type-body-strong-size); font-weight: var(--weight-semibold); letter-spacing: var(--type-body-strong-ls); }
+.ds-body      { font-size: var(--type-body-size); font-weight: var(--weight-regular); line-height: var(--type-body-lh); letter-spacing: var(--type-body-ls); }
+.ds-caption   { font-size: var(--type-caption-size); line-height: var(--type-caption-lh); letter-spacing: var(--type-caption-ls); }
+.ds-fine      { font-size: var(--type-fine-size); letter-spacing: var(--type-fine-ls); }
+
+/* Surface helpers */
+.ds-on-light    { color: var(--color-ink); }
+.ds-on-dark     { color: var(--color-on-dark); }
+.ds-bg-canvas   { background: var(--color-canvas); }
+.ds-bg-parchment{ background: var(--color-parchment); }
+.ds-bg-tile     { background: var(--color-tile-1); color: var(--color-on-dark); }
+.ds-bg-black    { background: var(--color-black); color: var(--color-on-dark); }

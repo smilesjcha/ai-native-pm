@@ -1,0 +1,16 @@
+{
+  "name": "lecture-build-pipeline",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Build pipeline: SVG→PNG, website capture, prototype demo video (mp4), slides→pdf. Uses system Chrome via Playwright.",
+  "scripts": {
+    "png": "node gen-png.js",
+    "capture": "node capture-getdesignmd.js",
+    "video": "node record-demo.js",
+    "pdf": "node slides-to-pdf.js"
+  },
+  "dependencies": {
+    "playwright": "^1.61.0"
+  }
+}

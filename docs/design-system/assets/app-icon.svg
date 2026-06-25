@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="오늘의 점심 메이트 앱 아이콘">
+  <defs>
+    <clipPath id="squircle">
+      <path d="M256 0C95 0 0 95 0 256s95 256 256 256 256-95 256-256S417 0 256 0Z" transform="translate(0,0)"/>
+    </clipPath>
+  </defs>
+  <!-- squircle-ish rounded square (Apple app icon shape) -->
+  <rect x="0" y="0" width="512" height="512" rx="114" fill="#f5f5f7"/>
+  <rect x="0" y="0" width="512" height="512" rx="114" fill="none"/>
+  <!-- bowl -->
+  <g transform="translate(256,266)">
+    <path d="M-150 -10h300a150 150 0 0 1-300 0z" fill="#0066cc"/>
+    <ellipse cx="0" cy="-10" rx="150" ry="34" fill="#0071e3"/>
+    <ellipse cx="0" cy="-12" rx="120" ry="24" fill="#fafafc"/>
+    <!-- steam -->
+    <g stroke="#1d1d1f" stroke-width="9" stroke-linecap="round" fill="none" opacity="0.85">
+      <path d="M-44 -70c-14 -16 14 -30 0 -50"/>
+      <path d="M0 -78c-14 -16 14 -30 0 -52"/>
+      <path d="M44 -70c-14 -16 14 -30 0 -50"/>
+    </g>
+  </g>
+  <!-- chopsticks -->
+  <g transform="translate(256,266)" stroke="#1d1d1f" stroke-width="10" stroke-linecap="round">
+    <line x1="120" y1="-120" x2="44" y2="6"/>
+    <line x1="150" y1="-104" x2="74" y2="20"/>
+  </g>
+</svg>

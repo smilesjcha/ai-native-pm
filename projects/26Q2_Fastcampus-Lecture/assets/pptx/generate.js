@@ -8,16 +8,27 @@ pres.title = "AI NATIVE 시대, AI PM의 새로운 무기";
 // ══════════════════════════════════════════════════════
 // DESIGN SYSTEM
 // ══════════════════════════════════════════════════════
+// Apple grammar × NanumGothic — single Action Blue accent. (keys kept for back-compat)
 const C = {
-  black: "111111",
-  darkGray: "2A2A2A",
-  midGray: "6B7280",
-  lightGray: "E5E7EB",
-  offWhite: "F5F5F5",
+  black: "1D1D1F",     // ink (near-black, premium — not pure black)
+  ink: "1D1D1F",
+  darkGray: "333333",
+  midGray: "86868B",   // Apple gray
+  gray: "86868B",
+  grayLine: "D2D2D7",
+  lightGray: "E8E8ED",
+  hairline: "E8E8ED",
+  offWhite: "F5F5F7",  // parchment
+  parchment: "F5F5F7",
   white: "FFFFFF",
-  accent: "FF6B35",
-  warmBg: "FEF3C7",
-  warmText: "92400E",
+  canvas: "FFFFFF",
+  tile: "1D1D1F",      // dark slide / section divider
+  accent: "0066CC",    // Action Blue — the single accent
+  blue: "0066CC",
+  focus: "0071E3",
+  sky: "2997FF",       // accent on dark surfaces
+  warmBg: "EAF2FB",    // emphasis card = blue tint (replaces old amber)
+  warmText: "004C99",
 };
 
 const SW = 10;
@@ -28,11 +39,11 @@ const BAR = 0.5;
 const L = {
   mx: 0.7,               // margin x (left/right)
   cw: 8.6,               // content width (SW - 2*mx)
-  titleY: BAR + 0.12,    // title Y position
+  titleY: 0.46,          // title Y position (raised for tighter premium header)
   titleH: 0.55,          // title height
-  subY: BAR + 0.7,       // subtitle Y
+  subY: 1.04,            // subtitle Y
   subH: 0.35,            // subtitle height
-  topY: 1.25,            // content area top
+  topY: 1.5,             // content area top (lowered for vertical balance)
   botY: SH - BAR - 0.4,  // content area bottom (for footer text)
   titleSize: 26,
   subSize: 12,
@@ -41,12 +52,13 @@ const L = {
   captionSize: 10,
 };
 
-// ── Font System: 나눔고딕 ──
+// ── Font System: 나눔고딕 통합 고정 (코드/숫자 포함 전부 NanumGothic) ──
 const F = {
   title: "NanumGothic ExtraBold",
   bold: "NanumGothic Bold",
   body: "NanumGothic",
-  code: "Consolas",
+  light: "NanumGothic Light",
+  code: "NanumGothic",
 };
 
 // ══════════════════════════════════════════════════════
@@ -55,15 +67,27 @@ const F = {
 
 function darkSlide() {
   const s = pres.addSlide();
-  s.background = { color: C.black };
+  s.background = { color: C.ink };
   return s;
 }
 
-function lightSlide() {
+// Premium running footer: hairline rule + left brand + right page number.
+function runningFooter(s) {
+  const num = pres.slides.length; // this slide is the latest added
+  s.addShape(pres.shapes.RECTANGLE, { x: L.mx, y: 5.05, w: L.cw, h: 0.008, fill: { color: C.hairline } });
+  s.addText("AI Native PM  ·  FastCampus", {
+    x: L.mx, y: 5.1, w: 5.0, h: 0.3, fontSize: 9, fontFace: F.body, color: C.midGray, margin: 0,
+  });
+  s.addText(String(num).padStart(2, "0"), {
+    x: SW - L.mx - 0.8, y: 5.1, w: 0.8, h: 0.3, fontSize: 9, fontFace: F.body, color: C.midGray, align: "right", margin: 0,
+  });
+}
+
+// Clean light canvas — near-invisible chrome (Apple). No heavy bars.
+function lightSlide(opts = {}) {
   const s = pres.addSlide();
-  s.background = { color: C.white };
-  s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: SW, h: BAR, fill: { color: C.black } });
-  s.addShape(pres.shapes.RECTANGLE, { x: 0, y: SH - BAR, w: SW, h: BAR, fill: { color: C.black } });
+  s.background = { color: opts.parchment ? C.parchment : C.white };
+  if (opts.footer !== false) runningFooter(s);
   return s;
 }
 
@@ -72,9 +96,9 @@ function addTitle(s, text, opts = {}) {
   s.addText(text, {
     x: L.mx, y: opts.y || L.titleY,
     w: L.cw, h: L.titleH,
-    fontSize: L.titleSize, fontFace: F.title,
-    color: dark ? C.white : C.black,
-    bold: true, margin: 0,
+    fontSize: opts.size || L.titleSize, fontFace: F.title,
+    color: dark ? C.white : C.ink,
+    bold: true, charSpacing: -0.4, margin: 0,
   });
 }
 
@@ -135,13 +159,14 @@ function addPlaceholder(s, x, y, w, h, label) {
 }
 
 function addCard(s, x, y, w, h, opts = {}) {
-  s.addShape(pres.shapes.RECTANGLE, {
-    x, y, w, h,
-    fill: { color: opts.bg || C.offWhite },
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, {
+    x, y, w, h, rectRadius: opts.radius != null ? opts.radius : 0.1,
+    fill: { color: opts.bg || C.parchment },
+    line: opts.border ? { color: C.hairline, width: 1 } : { type: "none" },
   });
   if (opts.leftAccent) {
-    s.addShape(pres.shapes.RECTANGLE, {
-      x, y, w: 0.04, h,
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, {
+      x, y, w: 0.06, h, rectRadius: 0.03,
       fill: { color: opts.leftAccent },
     });
   }
@@ -151,22 +176,31 @@ function addCard(s, x, y, w, h, opts = {}) {
 //  PART 1: LECTURE SLIDES
 // ══════════════════════════════════════════════════════
 
-// ─── SLIDE 1: TITLE (Dark) ───
+// ─── SLIDE 1: COVER (Dark, premium) ───
 {
   const s = darkSlide();
-  accentLine(s, 1.4);
+  // top kicker + short Action Blue rule
+  s.addShape(pres.shapes.RECTANGLE, { x: L.mx, y: 1.18, w: 0.6, h: 0.045, fill: { color: C.accent } });
+  s.addText("FASTCAMPUS  ·  AI NATIVE PM", {
+    x: L.mx, y: 1.32, w: L.cw, h: 0.3, fontSize: 12, fontFace: F.bold, color: C.sky, charSpacing: 2, margin: 0,
+  });
+  // display title
   s.addText("AI NATIVE 시대,\nAI PM의 새로운 무기", {
-    x: L.mx, y: 1.55, w: L.cw, h: 1.6,
-    fontSize: 38, fontFace: F.title,
-    color: C.white, margin: 0, lineSpacingMultiple: 1.25,
+    x: L.mx, y: 1.78, w: L.cw, h: 1.7,
+    fontSize: 44, fontFace: F.title, color: C.white, charSpacing: -1, margin: 0, lineSpacingMultiple: 1.12,
   });
-  s.addText("글로벌 PM 트렌드  ·  기획 문서 계층  ·  AI 도구 협업  ·  프로토타입 데모", {
-    x: L.mx, y: 3.3, w: L.cw, h: 0.35,
-    fontSize: 14, fontFace: F.body, color: C.midGray, margin: 0,
+  // topic line
+  s.addText("글로벌 PM 트렌드   ·   기획 문서 계층   ·   AI 도구 협업   ·   디자인→프로토타입", {
+    x: L.mx, y: 3.62, w: L.cw, h: 0.35, fontSize: 13.5, fontFace: F.body, color: C.midGray, margin: 0,
   });
-  s.addText("FastCampus  |  2026.04.16  |  차성재", {
-    x: L.mx, y: 4.5, w: L.cw, h: 0.35,
-    fontSize: 13, fontFace: F.body, color: C.accent, margin: 0,
+  // meta divider + line
+  s.addShape(pres.shapes.RECTANGLE, { x: L.mx, y: 4.5, w: L.cw, h: 0.008, fill: { color: "3A3A3C" } });
+  s.addText([
+    { text: "FastCampus", options: { color: C.white, fontFace: F.bold } },
+    { text: "      2026.06.26 (금) 17:00–19:00", options: { color: C.sky } },
+    { text: "      차성재", options: { color: C.white, fontFace: F.bold } },
+  ], {
+    x: L.mx, y: 4.66, w: L.cw, h: 0.35, fontSize: 13, fontFace: F.body, margin: 0,
   });
 }
 
@@ -252,15 +286,15 @@ function addCard(s, x, y, w, h, opts = {}) {
     ],
   ];
   s.addTable(tbl, {
-    x: 1.2, y: 1.2, w: 7.6, colW: [1.3, 2.1, 2.1, 2.1],
+    x: 1.2, y: 1.75, w: 7.6, colW: [1.3, 2.1, 2.1, 2.1],
     fontSize: 15, fontFace: F.body,
-    border: { pt: 0.5, color: C.lightGray },
-    rowH: [0.45, 0.55, 0.55], align: "center", valign: "middle",
+    border: { pt: 0.5, color: C.hairline },
+    rowH: [0.5, 0.58, 0.58], align: "center", valign: "middle",
   });
 
   s.addText("약 3배 증가", {
-    x: L.mx, y: 2.8, w: L.cw, h: 0.5,
-    fontSize: 28, fontFace: F.title, color: C.accent, align: "center", margin: 0,
+    x: L.mx, y: 3.65, w: L.cw, h: 0.6,
+    fontSize: 34, fontFace: F.title, color: C.accent, align: "center", charSpacing: -1, margin: 0,
   });
 
   addFooter(s, "출처: PM 채용 트렌드 리포트 2024-2026, 글로벌 채용 플랫폼 데이터 종합");
@@ -316,34 +350,34 @@ function addCard(s, x, y, w, h, opts = {}) {
   ];
 
   roles.forEach((r, i) => {
-    const y = 1.15 + i * 0.72;
-    // Number badge
-    s.addShape(pres.shapes.RECTANGLE, {
-      x: L.mx, y, w: 0.5, h: 0.55,
-      fill: { color: C.black },
+    const y = 1.72 + i * 0.7;
+    // Number badge (rounded, Action Blue)
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, {
+      x: L.mx, y, w: 0.5, h: 0.5, rectRadius: 0.07,
+      fill: { color: C.accent },
     });
     s.addText(r.num, {
-      x: L.mx, y, w: 0.5, h: 0.55,
+      x: L.mx, y, w: 0.5, h: 0.5,
       fontSize: 14, fontFace: F.title, color: C.white,
       align: "center", valign: "middle", margin: 0,
     });
     // Title
     s.addText(r.t, {
-      x: 1.4, y, w: 2.2, h: 0.55,
-      fontSize: 15, fontFace: F.title, color: C.black,
+      x: 1.4, y, w: 2.2, h: 0.5,
+      fontSize: 15, fontFace: F.title, color: C.ink,
       valign: "middle", margin: 0,
     });
     // Description
     s.addText(r.d, {
-      x: 3.7, y, w: 5.6, h: 0.55,
+      x: 3.7, y, w: 5.6, h: 0.5,
       fontSize: 12, fontFace: F.body, color: C.midGray,
       valign: "middle", margin: 0, lineSpacingMultiple: 1.25,
     });
     // Divider
     if (i < roles.length - 1) {
       s.addShape(pres.shapes.RECTANGLE, {
-        x: 1.4, y: y + 0.6, w: 7.9, h: 0.01,
-        fill: { color: C.lightGray },
+        x: 1.4, y: y + 0.58, w: 7.9, h: 0.008,
+        fill: { color: C.hairline },
       });
     }
   });
@@ -482,15 +516,15 @@ function addCard(s, x, y, w, h, opts = {}) {
     ],
   ];
   s.addTable(tbl, {
-    x: 0.5, y: 1.15, w: 9.0, colW: [1.5, 3.75, 3.75],
+    x: 0.5, y: 1.6, w: 9.0, colW: [1.5, 3.75, 3.75],
     fontSize: 12, fontFace: F.body,
     border: { pt: 0.5, color: C.lightGray },
     rowH: [0.4, 0.55, 0.55, 0.55], valign: "middle",
   });
 
-  addCard(s, L.mx, 3.5, L.cw, 0.55, { leftAccent: C.accent });
+  addCard(s, L.mx, 4.0, L.cw, 0.55, { leftAccent: C.accent });
   s.addText("바이브 프로토타이핑 (Vibe Prototyping) — 텍스트 프롬프트만으로 기능적 소프트웨어를 생성하는 새로운 패러다임  (Forbes, 2026)", {
-    x: L.mx + 0.2, y: 3.5, w: L.cw - 0.3, h: 0.55,
+    x: L.mx + 0.2, y: 4.0, w: L.cw - 0.3, h: 0.55,
     fontSize: L.smallSize, fontFace: F.body, color: C.darkGray, valign: "middle", margin: 0,
   });
 }
@@ -514,7 +548,7 @@ function addCard(s, x, y, w, h, opts = {}) {
     [{ text: "검증 주기", options: { bold: true, fontFace: F.bold } }, "분기 1회", "→", { text: "주 단위 반복", options: { color: C.accent, bold: true } }],
   ];
   s.addTable(tbl, {
-    x: 0.4, y: 1.15, w: 9.2, colW: [1.3, 2.9, 0.3, 4.7],
+    x: 0.4, y: 1.7, w: 9.2, colW: [1.3, 2.9, 0.3, 4.7],
     fontSize: 13, fontFace: F.body,
     border: { pt: 0.5, color: C.lightGray },
     rowH: [0.4, 0.44, 0.44, 0.44, 0.44, 0.44], valign: "middle",
@@ -533,7 +567,7 @@ function addCard(s, x, y, w, h, opts = {}) {
   ];
 
   skills.forEach((sk, i) => {
-    const y = 1.2 + i * 0.85;
+    const y = 1.62 + i * 0.85;
     addCard(s, L.mx, y, L.cw, 0.7);
     s.addText(sk.icon, {
       x: L.mx + 0.1, y, w: 0.5, h: 0.7,
@@ -566,7 +600,7 @@ function addCard(s, x, y, w, h, opts = {}) {
   ];
 
   docs.forEach((d, i) => {
-    const y = 1.15 + i * 0.72;
+    const y = 1.5 + i * 0.72;
     // Level badge
     s.addShape(pres.shapes.RECTANGLE, {
       x: L.mx, y: y + 0.05, w: 0.45, h: 0.42,
@@ -613,7 +647,7 @@ function addCard(s, x, y, w, h, opts = {}) {
   ];
 
   boxes.forEach((b, i) => {
-    const y = 1.15 + i * 0.9;
+    const y = 1.6 + i * 0.9;
     // Label box
     s.addShape(pres.shapes.RECTANGLE, { x: L.mx, y, w: 0.9, h: 0.65, fill: { color: b.color } });
     s.addText(b.label, {
@@ -658,7 +692,7 @@ function addCard(s, x, y, w, h, opts = {}) {
   ];
 
   perspectives.forEach((p, i) => {
-    const y = 1.15 + i * 0.9;
+    const y = 1.7 + i * 0.9;
     addCard(s, L.mx, y, L.cw, 0.75);
     s.addText(p.icon, {
       x: L.mx + 0.1, y, w: 0.45, h: 0.75,
@@ -700,7 +734,7 @@ function addCard(s, x, y, w, h, opts = {}) {
     ["배포", "수일", { text: "수분", options: { bold: true, color: C.accent } }, "Vercel, Replit, Lovable"],
   ];
   s.addTable(tbl, {
-    x: 0.5, y: 1.15, w: 9.0, colW: [1.2, 1.5, 1.5, 4.8],
+    x: 0.5, y: 1.6, w: 9.0, colW: [1.2, 1.5, 1.5, 4.8],
     fontSize: 12, fontFace: F.body,
     border: { pt: 0.5, color: C.lightGray },
     rowH: [0.4, 0.44, 0.44, 0.44, 0.44, 0.44], valign: "middle",
@@ -724,9 +758,9 @@ function addCard(s, x, y, w, h, opts = {}) {
   ];
 
   inputs.forEach((inp, i) => {
-    const y = 1.1 + i * 0.52;
+    const y = 1.68 + i * 0.46;
     // Number circle
-    s.addShape(pres.shapes.OVAL, { x: L.mx, y: y + 0.04, w: 0.38, h: 0.38, fill: { color: C.black } });
+    s.addShape(pres.shapes.OVAL, { x: L.mx, y: y + 0.04, w: 0.38, h: 0.38, fill: { color: C.accent } });
     s.addText(inp.n, {
       x: L.mx, y: y + 0.04, w: 0.38, h: 0.38,
       fontSize: 13, fontFace: F.title, color: C.white,
@@ -750,9 +784,9 @@ function addCard(s, x, y, w, h, opts = {}) {
   });
 
   // Bottom highlight bar
-  addCard(s, L.mx, 3.8, L.cw, 0.45, { bg: C.offWhite });
+  addCard(s, L.mx, 4.1, L.cw, 0.5, { bg: C.warmBg });
   s.addText("이 5개만 명확하면 AI가 나머지를 채워줍니다  →  실습 Step 1에서 직접 작성!", {
-    x: L.mx, y: 3.8, w: L.cw, h: 0.45,
+    x: L.mx, y: 4.1, w: L.cw, h: 0.5,
     fontSize: 12, fontFace: F.bold, color: C.accent,
     align: "center", valign: "middle", margin: 0,
   });
@@ -773,7 +807,7 @@ function addCard(s, x, y, w, h, opts = {}) {
   ];
 
   workflows.forEach((wf, i) => {
-    const y = 1.15 + i * 0.52;
+    const y = 1.7 + i * 0.52;
     const isOdd = i % 2 === 0;
     addCard(s, L.mx, y, L.cw, 0.42, { bg: isOdd ? C.offWhite : C.white });
     // Stage name
@@ -802,32 +836,32 @@ function addCard(s, x, y, w, h, opts = {}) {
   addTitle(s, "실전 도구 조합 예시");
 
   // Workflow 1
-  addCard(s, L.mx, 1.15, L.cw, 1.2);
+  addCard(s, L.mx, 1.5, L.cw, 1.2);
   s.addText("Workflow A:  기획 → 프로토타입 → 배포 (오늘 실습)", {
-    x: L.mx + 0.15, y: 1.2, w: 8.0, h: 0.35,
+    x: L.mx + 0.15, y: 1.55, w: 8.0, h: 0.35,
     fontSize: 13, fontFace: F.title, color: C.accent, margin: 0,
   });
   s.addText("Claude (리서치)  →  Manyfast (PRD)  →  Claude Code (프로토타입)  →  Vercel / Replit (배포)", {
-    x: L.mx + 0.15, y: 1.6, w: 8.0, h: 0.3,
+    x: L.mx + 0.15, y: 1.95, w: 8.0, h: 0.3,
     fontSize: 12, fontFace: F.body, color: C.black, margin: 0,
   });
   s.addText("5개 입력 → PRD 초안(~5분) → HTML 생성(~15분) → 배포(~2분)  =  총 30분 이내", {
-    x: L.mx + 0.15, y: 1.95, w: 8.0, h: 0.3,
+    x: L.mx + 0.15, y: 2.3, w: 8.0, h: 0.3,
     fontSize: L.captionSize, fontFace: F.body, color: C.midGray, margin: 0,
   });
 
   // Workflow 2
-  addCard(s, L.mx, 2.55, L.cw, 1.2);
+  addCard(s, L.mx, 2.9, L.cw, 1.2);
   s.addText("Workflow B:  디자인 중심 (Figma 활용)", {
-    x: L.mx + 0.15, y: 2.6, w: 8.0, h: 0.35,
+    x: L.mx + 0.15, y: 2.95, w: 8.0, h: 0.35,
     fontSize: 13, fontFace: F.title, color: C.black, margin: 0,
   });
   s.addText("Claude (PRD)  →  Figma AI / Make (와이어프레임)  →  Google Stitch (코드 변환)  →  Lovable (배포)", {
-    x: L.mx + 0.15, y: 3.0, w: 8.0, h: 0.3,
+    x: L.mx + 0.15, y: 3.35, w: 8.0, h: 0.3,
     fontSize: 12, fontFace: F.body, color: C.black, margin: 0,
   });
   s.addText("디자인 시스템이 중요한 B2C 서비스에 적합  |  Figma → 코드 자동 변환으로 개발 공수 절감", {
-    x: L.mx + 0.15, y: 3.35, w: 8.0, h: 0.3,
+    x: L.mx + 0.15, y: 3.7, w: 8.0, h: 0.3,
     fontSize: L.captionSize, fontFace: F.body, color: C.midGray, margin: 0,
   });
 
@@ -848,7 +882,7 @@ function addCard(s, x, y, w, h, opts = {}) {
   ];
 
   items.forEach((it, i) => {
-    const y = 1.15 + i * 0.68;
+    const y = 1.5 + i * 0.68;
     addCard(s, L.mx, y, 5.2, 0.55, { bg: i % 2 === 0 ? C.offWhite : C.white });
     s.addText(it.icon + "  " + it.label, {
       x: L.mx + 0.1, y, w: 1.5, h: 0.55,
@@ -860,8 +894,15 @@ function addCard(s, x, y, w, h, opts = {}) {
     });
   });
 
-  // Right placeholder
-  addPlaceholder(s, 6.2, 1.15, 3.1, 2.55, "PRD.md 화면 캡처\n(§3 문제 정의 + §11 KPI)");
+  // Right: real PRD.md render
+  s.addImage({
+    path: require("path").join(__dirname, "..", "references", "prd-capture.png"),
+    x: 6.05, y: 1.5, w: 3.25, h: 2.55, rounding: false,
+    sizing: { type: "contain", w: 3.25, h: 2.55 },
+  });
+  s.addText("PRD.md 렌더 — 오늘의 점심 메이트", {
+    x: 6.05, y: 4.1, w: 3.25, h: 0.25, fontSize: 9, fontFace: F.body, color: C.midGray, align: "center", italic: true, margin: 0,
+  });
 
   addFooter(s, "📋  화면 공유: PRD.md 라이브 시연");
 }
@@ -880,10 +921,16 @@ function addCard(s, x, y, w, h, opts = {}) {
     { text: "수락/거절 피드백 UI 포함", options: { bullet: true } },
   ], { w: 5.0, fs: 13 });
 
-  // Right placeholder
-  addPlaceholder(s, 6.0, 1.15, 3.3, 2.8, "프로토타입 모바일 화면 캡처\n(기분 선택 + 추천 결과 화면)");
+  // Right: real prototype screenshot (추천 결과 3카드)
+  s.addImage({
+    path: require("path").join(__dirname, "..", "references", "demo-results.png"),
+    x: 6.85, y: 1.05, w: 1.78, h: 3.4,
+  });
+  s.addText("추천 결과 화면 (오늘의 점심 메이트)", {
+    x: 5.9, y: 4.5, w: 3.7, h: 0.25, fontSize: 9, fontFace: F.body, color: C.midGray, align: "center", italic: true, margin: 0,
+  });
 
-  addFooter(s, "📱  화면 공유: 프로토타입 라이브 시연  |  demo-prototype.html");
+  addFooter(s, "📱  화면 공유: 프로토타입 라이브 시연  ·  workshop/prototype/index.html");
 }
 
 // ─── SLIDE 21: TRANSITION (Dark) ───
@@ -907,7 +954,7 @@ function addCard(s, x, y, w, h, opts = {}) {
     fontSize: 14, fontFace: F.body, color: C.white, align: "center", margin: 0,
     lineSpacingMultiple: 1.5,
   });
-  s.addText("🕐  잠시 쉬고, 19:20에 실습 시작!", {
+  s.addText("🕐  잠시 쉬고, 17:40에 실습 시작!", {
     x: L.mx, y: 4.6, w: L.cw, h: 0.3,
     fontSize: 12, fontFace: F.body, color: C.midGray, align: "center", margin: 0,
   });
@@ -929,7 +976,7 @@ function addCard(s, x, y, w, h, opts = {}) {
     x: L.mx, y: 2.9, w: L.cw, h: 0.4,
     fontSize: 16, fontFace: F.body, color: C.midGray, margin: 0,
   });
-  s.addText("19:20 ~ 20:20", {
+  s.addText("17:40 ~ 18:40", {
     x: L.mx, y: 3.4, w: L.cw, h: 0.35,
     fontSize: 13, fontFace: F.bold, color: C.accent, margin: 0,
   });
@@ -949,7 +996,7 @@ function addCard(s, x, y, w, h, opts = {}) {
   ];
 
   steps.forEach((st, i) => {
-    const y = 1.15 + i * 0.58;
+    const y = 1.6 + i * 0.58;
     const isLast = i === steps.length - 1;
     // Badge
     s.addShape(pres.shapes.RECTANGLE, {
@@ -1019,8 +1066,15 @@ function addCard(s, x, y, w, h, opts = {}) {
     fontSize: L.smallSize, fontFace: F.body, color: C.darkGray, margin: 0, lineSpacingMultiple: 1.4,
   });
 
-  // Placeholder
-  addPlaceholder(s, L.mx, 3.85, 4.2, 0.55, "Manyfast.io 로그인 화면 캡처");
+  // Real Manyfast.io login screen capture
+  s.addImage({
+    path: require("path").join(__dirname, "..", "references", "manyfast-login.png"),
+    x: L.mx, y: 2.95, w: 2.27, h: 1.8,
+    sizing: { type: "contain", w: 2.27, h: 1.8 },
+  });
+  s.addText("Manyfast.io 로그인 화면", {
+    x: 3.1, y: 3.5, w: 1.9, h: 0.5, fontSize: 11, fontFace: F.body, color: C.midGray, italic: true, valign: "middle", margin: 0,
+  });
 }
 
 // ─── SLIDE 25: STEP 1 — TEMPLATE ───
@@ -1028,7 +1082,7 @@ function addCard(s, x, y, w, h, opts = {}) {
   const s = lightSlide();
   addTitle(s, "Step 1: 5개 항목 채우기");
 
-  addCard(s, 0.9, 1.1, 8.2, 2.8, { bg: C.offWhite });
+  addCard(s, 0.9, 1.45, 8.2, 2.8, { bg: C.offWhite });
 
   const fields = [
     "1.  서비스명:  ___________________________________",
@@ -1039,13 +1093,13 @@ function addCard(s, x, y, w, h, opts = {}) {
   ];
   fields.forEach((f, i) => {
     s.addText(f, {
-      x: 1.2, y: 1.3 + i * 0.45, w: 7.6, h: 0.4,
+      x: 1.2, y: 1.65 + i * 0.45, w: 7.6, h: 0.4,
       fontSize: 15, fontFace: F.body, color: C.black, margin: 0,
     });
   });
 
   s.addText("⏱  10분 안에 채워주세요!", {
-    x: L.mx, y: 4.15, w: L.cw, h: 0.3,
+    x: L.mx, y: 4.5, w: L.cw, h: 0.3,
     fontSize: 13, fontFace: F.bold, color: C.accent, align: "center", margin: 0,
   });
 }
@@ -1055,7 +1109,7 @@ function addCard(s, x, y, w, h, opts = {}) {
   const s = lightSlide();
   addTitle(s, "Step 1: 예시 — 오늘의 점심 메이트");
 
-  addCard(s, 0.9, 1.1, 8.2, 2.8, { bg: C.offWhite, leftAccent: C.accent });
+  addCard(s, 0.9, 1.5, 8.2, 2.8, { bg: C.offWhite, leftAccent: C.accent });
 
   const filled = [
     { l: "1.  서비스명:", v: "  오늘의 점심 메이트" },
@@ -1069,7 +1123,7 @@ function addCard(s, x, y, w, h, opts = {}) {
       { text: f.l, options: { bold: true, fontFace: F.bold } },
       { text: f.v, options: { color: C.accent } },
     ], {
-      x: 1.2, y: 1.3 + i * 0.45, w: 7.6, h: 0.4,
+      x: 1.2, y: 1.7 + i * 0.45, w: 7.6, h: 0.4,
       fontSize: 14, fontFace: F.body, color: C.black, margin: 0,
     });
   });
@@ -1081,17 +1135,17 @@ function addCard(s, x, y, w, h, opts = {}) {
   addTitle(s, "Step 1: 짝꿍 피드백");
 
   s.addText("옆 사람에게 보여주세요", {
-    x: L.mx, y: 1.3, w: L.cw, h: 0.6,
+    x: L.mx, y: 1.75, w: L.cw, h: 0.6,
     fontSize: 28, fontFace: F.title, color: C.black, align: "center", valign: "middle", margin: 0,
   });
 
-  addCard(s, 2.0, 2.2, 6.0, 1.2, { bg: C.offWhite });
+  addCard(s, 2.0, 2.7, 6.0, 1.2, { bg: C.offWhite });
   s.addText("\"이 서비스를 당장 쓸 것 같나요?\"", {
-    x: 2.2, y: 2.3, w: 5.6, h: 0.4,
+    x: 2.2, y: 2.8, w: 5.6, h: 0.4,
     fontSize: 16, fontFace: F.bold, color: C.accent, align: "center", margin: 0,
   });
   s.addText("네 → 좋은 신호! 🎯    |    글쎄 → 핵심 문제 다시 점검 🔍", {
-    x: 2.2, y: 2.85, w: 5.6, h: 0.35,
+    x: 2.2, y: 3.35, w: 5.6, h: 0.35,
     fontSize: 13, fontFace: F.body, color: C.darkGray, align: "center", margin: 0,
   });
 
@@ -1110,13 +1164,20 @@ function addCard(s, x, y, w, h, opts = {}) {
     { text: "4.  핵심 기능 부분만 복사 → 메모장 저장", options: { breakLine: true, bold: true } },
   ], { w: 5.0, fs: 14 });
 
-  // Placeholder for Manyfast screenshot
-  addPlaceholder(s, 6.0, 1.15, 3.3, 2.0, "Manyfast.io PRD 생성 화면 캡처\n(입력 → 결과)");
+  // Real Manyfast.io capture (idea typed in)
+  s.addImage({
+    path: require("path").join(__dirname, "..", "references", "manyfast-input.png"),
+    x: 6.0, y: 1.5, w: 3.3, h: 2.2,
+    sizing: { type: "contain", w: 3.3, h: 2.2 },
+  });
+  s.addText("Manyfast.io — 아이디어 입력 화면", {
+    x: 6.0, y: 3.72, w: 3.3, h: 0.22, fontSize: 9, fontFace: F.body, color: C.midGray, align: "center", italic: true, margin: 0,
+  });
 
   // Warning
-  addCard(s, L.mx, 3.6, L.cw, 0.55, { bg: C.warmBg });
+  addCard(s, L.mx, 4.05, L.cw, 0.55, { bg: C.warmBg });
   s.addText("⚠️  PRD 전체 복사 금지 — 핵심 기능 3줄 요약만 저장 (토큰 절감)", {
-    x: L.mx + 0.15, y: 3.6, w: L.cw - 0.3, h: 0.55,
+    x: L.mx + 0.15, y: 4.05, w: L.cw - 0.3, h: 0.55,
     fontSize: 12, fontFace: F.bold, color: C.warmText, valign: "middle", margin: 0,
   });
 }
@@ -1134,7 +1195,7 @@ function addCard(s, x, y, w, h, opts = {}) {
   ];
 
   checks.forEach((c, i) => {
-    const y = 1.15 + i * 0.85;
+    const y = 1.75 + i * 0.85;
     addCard(s, L.mx, y, L.cw, 0.7, { bg: C.offWhite });
     s.addText("✅  " + c.check, {
       x: L.mx + 0.1, y, w: L.cw - 0.2, h: 0.3,
@@ -1161,7 +1222,7 @@ function addCard(s, x, y, w, h, opts = {}) {
   addTitle(s, "Step 3: Claude → 프로토타입 생성");
 
   // Code block
-  s.addShape(pres.shapes.RECTANGLE, { x: L.mx, y: 1.1, w: L.cw, h: 2.6, fill: { color: C.darkGray } });
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: L.mx, y: 1.5, w: L.cw, h: 2.6, rectRadius: 0.1, fill: { color: C.darkGray } });
   s.addText([
     { text: "아래 PRD를 기반으로 모바일 웹 UI 프로토타입을\nHTML 단일 파일로 만들어줘.\n\n", options: { color: C.white } },
     { text: "[서비스명]: ", options: { color: C.midGray } },
@@ -1173,12 +1234,12 @@ function addCard(s, x, y, w, h, opts = {}) {
     { text: "[디자인]: ", options: { color: C.midGray } },
     { text: "모던 카드형 UI, 따뜻한 컬러 톤", options: { color: C.accent } },
   ], {
-    x: L.mx + 0.3, y: 1.3, w: L.cw - 0.6, h: 2.2,
+    x: L.mx + 0.3, y: 1.7, w: L.cw - 0.6, h: 2.2,
     fontSize: 12, fontFace: F.code, margin: 0, lineSpacingMultiple: 1.35,
   });
 
   s.addText("💡 프롬프트를 복사해서 Claude.ai 또는 Claude Code에 붙여넣기  |  필요시 수정 프롬프트 추가", {
-    x: L.mx, y: 3.9, w: L.cw, h: 0.3,
+    x: L.mx, y: 4.3, w: L.cw, h: 0.3,
     fontSize: L.smallSize, fontFace: F.body, color: C.accent, align: "center", margin: 0,
   });
 }
@@ -1200,7 +1261,7 @@ function addCard(s, x, y, w, h, opts = {}) {
     ["기능이 동작하지 않음", "'버튼 클릭 이벤트가 작동하도록 JS 수정해줘' 재요청"],
   ];
   s.addTable(tbl, {
-    x: 0.5, y: 1.15, w: 9.0, colW: [2.5, 6.5],
+    x: 0.5, y: 1.6, w: 9.0, colW: [2.5, 6.5],
     fontSize: 12, fontFace: F.body,
     border: { pt: 0.5, color: C.lightGray },
     rowH: [0.38, 0.4, 0.4, 0.4, 0.4, 0.4], valign: "middle",
@@ -1223,20 +1284,20 @@ function addCard(s, x, y, w, h, opts = {}) {
 
   deploys.forEach((d, i) => {
     const x = L.mx + i * 3.0;
-    addCard(s, x, 1.15, 2.75, 2.6, { bg: d.bg });
+    addCard(s, x, 1.65, 2.75, 2.6, { bg: d.bg });
     s.addText(d.name, {
-      x: x + 0.15, y: 1.25, w: 2.45, h: 0.35,
+      x: x + 0.15, y: 1.75, w: 2.45, h: 0.35,
       fontSize: 16, fontFace: F.title, color: C.accent, margin: 0,
     });
     s.addText(d.desc, {
-      x: x + 0.15, y: 1.7, w: 2.45, h: 0.8,
+      x: x + 0.15, y: 2.2, w: 2.45, h: 0.8,
       fontSize: L.smallSize, fontFace: F.body, color: C.darkGray, margin: 0, lineSpacingMultiple: 1.3,
     });
     s.addShape(pres.shapes.RECTANGLE, {
-      x: x + 0.15, y: 2.6, w: 2.45, h: 0.02, fill: { color: C.lightGray },
+      x: x + 0.15, y: 3.1, w: 2.45, h: 0.02, fill: { color: C.lightGray },
     });
     s.addText("추천: " + d.use, {
-      x: x + 0.15, y: 2.7, w: 2.45, h: 0.3,
+      x: x + 0.15, y: 3.2, w: 2.45, h: 0.3,
       fontSize: L.captionSize, fontFace: F.bold, color: C.midGray, margin: 0,
     });
   });
@@ -1275,7 +1336,7 @@ function addCard(s, x, y, w, h, opts = {}) {
   ];
 
   levels.forEach((lv, i) => {
-    const y = 1.1 + i * 0.7;
+    const y = 1.6 + i * 0.7;
     // Card
     addCard(s, L.mx, y, L.cw, 0.58, { bg: lv.bg });
     // Badge
@@ -1325,7 +1386,7 @@ function addCard(s, x, y, w, h, opts = {}) {
   addTitle(s, "Case: AI Doc Feedback Loop");
   addSubtitle(s, "Lv.4 \"PM 조직 통합 자동화\"의 실사례 — AI가 빠르게 쓰는 만큼, 사람 피드백도 같은 속도로 다시 AI에게.");
 
-  const colW = 4.1, colY = 1.3, colH = 3.0;
+  const colW = 4.1, colY = 1.5, colH = 2.95;
 
   // AS-IS
   addCard(s, L.mx, colY, colW, colH, { bg: C.offWhite });
@@ -1396,62 +1457,60 @@ function addCard(s, x, y, w, h, opts = {}) {
   };
 
   const rows = [
-    { label: "High-Level Context", sub: "프로젝트·프로덕트 세계관 · 전략 판단", cats: ["정책", "컨텍스트", "문제"], y: 1.3 },
-    { label: "Low-Level Spec",     sub: "UX · 코드 구현을 위한 상세 정책",      cats: ["해결점", "기능", "화면"],   y: 2.6 },
+    { label: "High-Level Context", sub: "프로젝트·프로덕트 세계관 · 전략 판단", cats: ["정책", "컨텍스트", "문제"], y: 1.6 },
+    { label: "Low-Level Spec",     sub: "UX · 코드 구현을 위한 상세 정책",      cats: ["해결점", "기능", "화면"],   y: 2.68 },
   ];
 
   rows.forEach(row => {
     s.addText(row.label, {
-      x: L.mx, y: row.y, w: 2.5, h: 0.4,
-      fontSize: 13, fontFace: F.title, color: C.black, margin: 0,
+      x: L.mx, y: row.y + 0.18, w: 2.3, h: 0.35,
+      fontSize: 13, fontFace: F.title, color: C.ink, margin: 0,
     });
     s.addText(row.sub, {
-      x: L.mx, y: row.y + 0.42, w: 2.5, h: 0.5,
+      x: L.mx, y: row.y + 0.55, w: 2.3, h: 0.45,
       fontSize: L.captionSize, fontFace: F.body, color: C.midGray,
-      margin: 0, lineSpacingMultiple: 1.3,
+      margin: 0, lineSpacingMultiple: 1.25,
     });
     row.cats.forEach((cat, i) => {
-      const cx = 3.0 + i * 2.1, cy = row.y, cw = 2.0, ch = 1.05;
-      s.addShape(pres.shapes.RECTANGLE, {
-        x: cx, y: cy, w: cw, h: ch, fill: { color: catColor[cat] },
+      const cx = 3.0 + i * 2.0, cy = row.y, cw = 1.9, ch = 0.92;
+      s.addShape(pres.shapes.ROUNDED_RECTANGLE, {
+        x: cx, y: cy, w: cw, h: ch, rectRadius: 0.08, fill: { color: catColor[cat] }, line: { type: "none" },
       });
       s.addText(cat, {
-        x: cx, y: cy + 0.18, w: cw, h: 0.4,
-        fontSize: 18, fontFace: F.title, color: C.white,
+        x: cx, y: cy + 0.16, w: cw, h: 0.38,
+        fontSize: 17, fontFace: F.title, color: C.white,
         align: "center", margin: 0,
       });
       s.addText(catEn[cat], {
-        x: cx, y: cy + 0.62, w: cw, h: 0.3,
-        fontSize: L.captionSize, fontFace: F.body, color: C.white,
+        x: cx, y: cy + 0.55, w: cw, h: 0.28,
+        fontSize: 9.5, fontFace: F.body, color: C.white,
         align: "center", margin: 0,
       });
     });
   });
 
   // Bottom: 산출되는 두 종류 MD
-  const oy = 3.95;
-  s.addText("📄  피드백 저장 시 산출되는 두 종류 MD", {
-    x: L.mx, y: oy, w: L.cw, h: 0.35,
-    fontSize: 13, fontFace: F.title, color: C.black, margin: 0,
+  const oy = 3.86;
+  s.addText("피드백 저장 시 산출되는 두 종류 MD", {
+    x: L.mx, y: oy, w: L.cw, h: 0.3,
+    fontSize: 12, fontFace: F.title, color: C.ink, margin: 0,
   });
-  addCard(s, L.mx, oy + 0.4, 4.3, 0.62, { bg: C.offWhite, leftAccent: "1F883D" });
+  addCard(s, L.mx, oy + 0.34, 4.3, 0.56, { bg: C.offWhite, leftAccent: "1F883D" });
   s.addText([
-    { text: "원본 + 피드백 이력 MD\n", options: { fontSize: 12, bold: true, color: C.black, fontFace: F.bold } },
-    { text: "카테고리별 시각·작성자·본문 누적 테이블", options: { fontSize: L.captionSize, color: C.midGray } },
+    { text: "원본 + 피드백 이력 MD\n", options: { fontSize: 11.5, bold: true, color: C.ink, fontFace: F.bold } },
+    { text: "카테고리별 시각·작성자·본문 누적 테이블", options: { fontSize: 9.5, color: C.midGray } },
   ], {
-    x: L.mx + 0.18, y: oy + 0.42, w: 4.0, h: 0.58,
-    fontFace: F.body, margin: 0, lineSpacingMultiple: 1.25, valign: "middle",
+    x: L.mx + 0.18, y: oy + 0.36, w: 4.0, h: 0.52,
+    fontFace: F.body, margin: 0, lineSpacingMultiple: 1.2, valign: "middle",
   });
-  addCard(s, L.mx + 4.45, oy + 0.4, 4.15, 0.62, { bg: C.warmBg, leftAccent: C.accent });
+  addCard(s, L.mx + 4.45, oy + 0.34, 4.15, 0.56, { bg: C.warmBg, leftAccent: C.accent });
   s.addText([
-    { text: "AI 개선 요약 MD\n", options: { fontSize: 12, bold: true, color: C.warmText, fontFace: F.bold } },
-    { text: "카테고리별 핵심 정리 1줄 + 개선안 3개", options: { fontSize: L.captionSize, color: C.warmText } },
+    { text: "AI 개선 요약 MD\n", options: { fontSize: 11.5, bold: true, color: C.warmText, fontFace: F.bold } },
+    { text: "카테고리별 핵심 정리 1줄 + 개선안 3개", options: { fontSize: 9.5, color: C.warmText } },
   ], {
-    x: L.mx + 4.63, y: oy + 0.42, w: 3.9, h: 0.58,
-    fontFace: F.body, margin: 0, lineSpacingMultiple: 1.25, valign: "middle",
+    x: L.mx + 4.63, y: oy + 0.36, w: 3.9, h: 0.52,
+    fontFace: F.body, margin: 0, lineSpacingMultiple: 1.2, valign: "middle",
   });
-
-  addFooter(s, "AI 추천 원칙: 카테고리별 3개 (피드백이 있으면 그대로 정리, 없으면 AI 아이디어 3개)");
 }
 
 // ─── SLIDE 36: LOCAL-FIRST WEB APP DEMO ───
@@ -1460,7 +1519,7 @@ function addCard(s, x, y, w, h, opts = {}) {
   addTitle(s, "데모: Local-first 웹 앱");
   addSubtitle(s, "Express + Vanilla JS · Claude/Codex CLI 자동 연동 · MD 호환 (GitHub/VS Code에서도 깨짐 없음)");
 
-  const py = 1.3, ph = 2.35;
+  const py = 1.55, ph = 2.35;
 
   // Left — Tree
   addCard(s, L.mx, py, 1.6, ph, { bg: C.offWhite });
@@ -1561,7 +1620,213 @@ function addCard(s, x, y, w, h, opts = {}) {
   addFooter(s, "Code: projects/26Q2_AI-Doc-Feedback-Loop/app  ·  cd app && npm install && npm start  ·  http://localhost:5174");
 }
 
-// ─── SLIDE 37: CLOSING (Dark) ───
+// ══════════════════════════════════════════════════════
+// CASE STUDY 2: DESIGN SYSTEM → PROTOTYPE (v03 additions, 2026-06-26)
+// 기존 페이지(SLIDE 1~36)는 건드리지 않고, Closing 앞에 7슬라이드 추가.
+// Apple 디자인 시스템(getdesign.md) → 토큰 → 와이어프레임 → 프로토타입 → 데모영상
+// ══════════════════════════════════════════════════════
+const path = require("path");
+const fs = require("fs");
+const REF = (f) => path.join(__dirname, "..", "references", f);
+const PROTO = (f) => path.join(__dirname, "..", "..", "workshop", "prototype", f);
+const dataUri = (f) => "data:image/png;base64," + fs.readFileSync(f).toString("base64");
+const APPLE = { blue: "0066CC", focus: "0071E3", sky: "2997FF", ink: "1D1D1F", parchment: "F5F5F7", tile: "272729", pearl: "FAFAFC" };
+
+// ─── SLIDE 37: SECTION DIVIDER (Dark) ───
+{
+  const s = darkSlide();
+  s.addText("PART 3", {
+    x: L.mx, y: 1.2, w: L.cw, h: 0.4,
+    fontSize: 14, fontFace: F.bold, color: C.accent, charSpacing: 3, margin: 0,
+  });
+  s.addText("디자인 시스템부터 프로토타입까지", {
+    x: L.mx, y: 1.6, w: L.cw, h: 0.9,
+    fontSize: 32, fontFace: F.title, color: C.white, margin: 0,
+  });
+  s.addText("Apple 디자인 시스템을 입혀, AI-Native PM이 레퍼런스 → 토큰 → 와이어프레임 → 프로토타입 → 데모까지 직접 만든다", {
+    x: L.mx, y: 2.55, w: L.cw, h: 0.5,
+    fontSize: 13, fontFace: F.body, color: C.midGray, margin: 0, lineSpacingMultiple: 1.3,
+  });
+  const steps = ["DESIGN.md\n레퍼런스", "Design Tokens\nJSON·CSS·JS", "Wireframe\nFigma 보드", "Prototype\n동작 화면", "Demo Video\nMP4"];
+  const bw = (L.cw - 0.4 * 4) / 5;
+  steps.forEach((t, i) => {
+    const x = L.mx + i * (bw + 0.4);
+    s.addShape(pres.shapes.RECTANGLE, { x, y: 3.6, w: bw, h: 0.95, fill: { color: i === 4 ? C.accent : "222222" }, line: { color: "333333", width: 1 } });
+    s.addText(`${i + 1}`, { x, y: 3.7, w: bw, h: 0.3, fontSize: 12, fontFace: F.title, color: i === 4 ? C.white : C.accent, align: "center", margin: 0 });
+    s.addText(t, { x, y: 4.0, w: bw, h: 0.5, fontSize: 10, fontFace: F.body, color: C.white, align: "center", margin: 0, lineSpacingMultiple: 1.15 });
+    if (i < 4) s.addText("→", { x: x + bw, y: 3.6, w: 0.4, h: 0.95, fontSize: 16, color: C.midGray, align: "center", valign: "middle", margin: 0 });
+  });
+}
+
+// ─── SLIDE 38: getdesign.md → DESIGN.md ───
+{
+  const s = lightSlide();
+  addTitle(s, "1. 디자인 레퍼런스 확보 — getdesign.md");
+  addSubtitle(s, "검증된 디자인 시스템을 .md 파일 하나로.");
+
+  // left bullets
+  s.addText([
+    { text: "getdesign.md/apple/design-md\n", options: { fontSize: 13, color: APPLE.blue, fontFace: F.bold } },
+    { text: "Apple 디자인 시스템 분석본\n\n", options: { fontSize: 11, color: C.midGray } },
+    { text: "①  ", options: { fontSize: 13, color: C.accent, fontFace: F.bold } },
+    { text: "“Download DESIGN.md” 클릭 (우측 하이라이트)\n", options: { fontSize: 12, color: C.black } },
+    { text: "②  ", options: { fontSize: 13, color: C.accent, fontFace: F.bold } },
+    { text: "컬러·타이포·컴포넌트가 토큰화된 .md 확보\n", options: { fontSize: 12, color: C.black } },
+    { text: "③  ", options: { fontSize: 13, color: C.accent, fontFace: F.bold } },
+    { text: "docs/design-system/DESIGN.md 로 저장\n", options: { fontSize: 12, color: C.black } },
+    { text: "④  ", options: { fontSize: 13, color: C.accent, fontFace: F.bold } },
+    { text: "Claude/Codex에 그대로 입력 → SSOT", options: { fontSize: 12, color: C.black } },
+  ], { x: L.mx, y: 1.62, w: 3.2, h: 3.0, margin: 0, lineSpacingMultiple: 1.4, valign: "top" });
+
+  s.addImage({ path: REF("getdesignmd-download-highlight.png"), x: 4.05, y: 1.62, w: 5.0, h: 3.125 });
+  s.addText("실제 캡처 — Download DESIGN.md 버튼", { x: 4.05, y: 4.45, w: 5.0, h: 0.25, fontSize: 9, fontFace: F.body, color: C.midGray, align: "center", italic: true, margin: 0 });
+  addFooter(s, "npx getdesign@latest add apple  →  프로젝트 루트에서 실행하면 AI가 해당 디자인으로 UI를 만든다");
+}
+
+// ─── SLIDE 39: DESIGN TOKEN SYSTEM ───
+{
+  const s = lightSlide();
+  addTitle(s, "2. Design Token System — 단일 출처(JSON)");
+  addSubtitle(s, "JSON 하나만 고치면 CSS·JS가 함께 갱신.");
+
+  // pipeline json → css → js
+  const pipe = [["tokens.json", "W3C 포맷 · SSOT"], ["tokens.css", ":root 변수"], ["tokens.js", "ESM import"]];
+  pipe.forEach(([a, b], i) => {
+    const x = L.mx + i * 2.0;
+    addCard(s, x, 1.62, 1.7, 0.72, { bg: C.offWhite, leftAccent: APPLE.blue });
+    s.addText(a, { x: x + 0.14, y: 1.72, w: 1.5, h: 0.3, fontSize: 12, fontFace: F.bold, color: APPLE.blue, margin: 0 });
+    s.addText(b, { x: x + 0.14, y: 2.02, w: 1.5, h: 0.3, fontSize: 9, fontFace: F.body, color: C.midGray, margin: 0 });
+    if (i < 2) s.addText("→", { x: x + 1.7, y: 1.62, w: 0.3, h: 0.72, fontSize: 16, color: C.midGray, align: "center", valign: "middle", margin: 0 });
+  });
+
+  // swatches
+  const sw = [["Action Blue", APPLE.blue], ["ink", APPLE.ink], ["parchment", APPLE.parchment], ["tile", APPLE.tile], ["sky-link", APPLE.sky]];
+  s.addText("COLOR — 단일 액센트", { x: L.mx, y: 2.4, w: 4, h: 0.25, fontSize: 10, fontFace: F.bold, color: C.midGray, margin: 0 });
+  sw.forEach(([n, hex], i) => {
+    const x = L.mx + i * 1.55;
+    s.addShape(pres.shapes.RECTANGLE, { x, y: 2.7, w: 1.4, h: 0.6, fill: { color: hex }, line: { color: "E0E0E0", width: 0.5 } });
+    s.addText(n, { x, y: 3.32, w: 1.4, h: 0.22, fontSize: 9, fontFace: F.body, color: C.black, align: "center", margin: 0 });
+    s.addText("#" + hex.toLowerCase(), { x, y: 3.52, w: 1.4, h: 0.2, fontSize: 8, fontFace: F.code, color: C.midGray, align: "center", margin: 0 });
+  });
+
+  // type + radius rules
+  addCard(s, L.mx, 3.95, 4.2, 0.85, { bg: C.offWhite });
+  s.addText([
+    { text: "TYPE  ", options: { fontSize: 10, fontFace: F.bold, color: C.midGray } },
+    { text: "본문 17px / lh 1.47 · 디스플레이 SF Pro 600 · 음수 트래킹\n", options: { fontSize: 11, color: C.black } },
+    { text: "WEIGHT  ", options: { fontSize: 10, fontFace: F.bold, color: C.midGray } },
+    { text: "300 / 400 / 600 / 700 — 500은 의도적 부재", options: { fontSize: 11, color: C.black } },
+  ], { x: L.mx + 0.15, y: 4.05, w: 3.9, h: 0.65, margin: 0, lineSpacingMultiple: 1.3, valign: "middle" });
+  addCard(s, 5.1, 3.95, 3.5, 0.85, { bg: C.offWhite });
+  s.addText([
+    { text: "RADIUS  ", options: { fontSize: 10, fontFace: F.bold, color: C.midGray } },
+    { text: "sm8 · md11 · lg18 · pill ∞\n", options: { fontSize: 11, color: C.black } },
+    { text: "SHADOW  ", options: { fontSize: 10, fontFace: F.bold, color: C.midGray } },
+    { text: "제품 이미지에만 — 시스템 유일", options: { fontSize: 11, color: C.black } },
+  ], { x: 5.25, y: 4.05, w: 3.2, h: 0.65, margin: 0, lineSpacingMultiple: 1.3, valign: "middle" });
+}
+
+// ─── SLIDE 40: DESIGN SYSTEM INFRA — FILE STRUCTURE ───
+{
+  const s = lightSlide();
+  addTitle(s, "3. 디자인 시스템 인프라 — 파일 구조");
+  addSubtitle(s, "docs/design-system/ 공용 자산. 토큰·스타일·아이콘(SVG+PNG)·에셋·리빙 스타일 가이드.");
+
+  s.addText([
+    { text: "docs/design-system/\n", options: { fontFace: F.code, fontSize: 11, color: C.black, bold: true } },
+    { text: "├─ DESIGN.md            ", options: { fontFace: F.code, fontSize: 10.5, color: C.darkGray } },
+    { text: "← Apple 분석 (SSOT)\n", options: { fontFace: F.body, fontSize: 9.5, color: C.midGray } },
+    { text: "├─ tokens/\n", options: { fontFace: F.code, fontSize: 10.5, color: APPLE.blue } },
+    { text: "│   ├─ tokens.json · tokens.css · tokens.js\n", options: { fontFace: F.code, fontSize: 10.5, color: C.darkGray } },
+    { text: "├─ styles/\n", options: { fontFace: F.code, fontSize: 10.5, color: APPLE.blue } },
+    { text: "│   ├─ reset · base · components.css\n", options: { fontFace: F.code, fontSize: 10.5, color: C.darkGray } },
+    { text: "├─ icons/   ", options: { fontFace: F.code, fontSize: 10.5, color: APPLE.blue } },
+    { text: "14 SVG + png/\n", options: { fontFace: F.body, fontSize: 9.5, color: C.midGray } },
+    { text: "├─ assets/  ", options: { fontFace: F.code, fontSize: 10.5, color: APPLE.blue } },
+    { text: "app-icon·logo·og (svg+png)\n", options: { fontFace: F.body, fontSize: 9.5, color: C.midGray } },
+    { text: "└─ style-guide.html     ", options: { fontFace: F.code, fontSize: 10.5, color: C.darkGray } },
+    { text: "← 리빙 가이드", options: { fontFace: F.body, fontSize: 9.5, color: C.midGray } },
+  ], { x: L.mx, y: 1.62, w: 4.0, h: 3.0, margin: 0, lineSpacingMultiple: 1.36, valign: "top" });
+
+  s.addImage({ path: REF("style-guide-top.png"), x: 4.75, y: 1.62, w: 3.85, h: 2.68 });
+  s.addText("style-guide.html — 토큰·컴포넌트 리빙 가이드", { x: 4.75, y: 4.05, w: 3.85, h: 0.25, fontSize: 9, fontFace: F.body, color: C.midGray, align: "center", italic: true, margin: 0 });
+  addFooter(s, "JSON만 수정 → CSS·JS 재생성. Style Dictionary / Tokens Studio(Figma)와 호환되는 W3C 포맷");
+}
+
+// ─── SLIDE 41: WIREFRAMES — FIGMA-STYLE BOARD ───
+{
+  const s = lightSlide();
+  addTitle(s, "4. 와이어프레임 — Figma 스타일 계층 보드");
+  addSubtitle(s, "PRD를 흐름 단계별로 분리한 모바일 시안 (오늘의 점심 메이트).");
+
+  s.addImage({ path: REF("wireframes-board.png"), x: 0.7, y: 1.66, w: 1.42, h: 2.9 });
+  s.addText("9 화면 · 4 단계", { x: 0.7, y: 4.58, w: 1.42, h: 0.22, fontSize: 9, fontFace: F.body, color: C.midGray, align: "center", italic: true, margin: 0 });
+
+  const stages = [
+    ["1 · 진입 & 온보딩", "Splash · 위치 허용(F5)"],
+    ["2 · 조건 입력", "기분(F1) · 예산(F2) · 선호 — 3탭"],
+    ["3 · AI 추천 생성", "로딩 · 추천 결과 3카드 (F3·F4)"],
+    ["4 · 결정 & 출발", "상세·지도(F4) · 인기 메뉴(F6)"],
+  ];
+  stages.forEach(([t, d], i) => {
+    const y = 1.66 + i * 0.72;
+    addCard(s, 2.55, y, 6.05, 0.6, { bg: C.offWhite, leftAccent: C.accent });
+    s.addText(t, { x: 2.75, y: y + 0.06, w: 5.7, h: 0.3, fontSize: 13, fontFace: F.title, color: C.ink, margin: 0 });
+    s.addText(d, { x: 2.75, y: y + 0.34, w: 5.7, h: 0.22, fontSize: 10.5, fontFace: F.body, color: C.midGray, margin: 0 });
+  });
+  addFooter(s, "계층: Flow stage → Screen frame → Component(디자인 시스템 토큰) · workshop/wireframes/index.html");
+}
+
+// ─── SLIDE 42: PROTOTYPE & DEMO VIDEO ───
+{
+  const s = lightSlide();
+  addTitle(s, "5. 프로토타입 & 데모 영상");
+  addSubtitle(s, "동작 HTML → 클릭 흐름을 MP4로 녹화.");
+
+  // static results frame
+  s.addImage({ path: REF("demo-results.png"), x: 0.8, y: 1.5, w: 1.62, h: 3.1 });
+  // embedded playable video (poster = detail) — plays in PowerPoint
+  s.addMedia({ type: "video", path: PROTO("demo-todays-lunch-mate.mp4"), cover: dataUri(REF("demo-detail.png")), x: 2.6, y: 1.5, w: 1.62, h: 3.1 });
+  s.addText("▶ 클릭 데모 (MP4, 28초)", { x: 2.6, y: 4.62, w: 1.62, h: 0.22, fontSize: 9, fontFace: F.body, color: APPLE.blue, align: "center", margin: 0 });
+
+  s.addText([
+    { text: "동작 프로토타입\n", options: { fontSize: 13, fontFace: F.bold, color: C.black } },
+    { text: "단일 HTML · 디자인 시스템 토큰 적용 · 8화면 상태기계\n\n", options: { fontSize: 11, color: C.midGray } },
+    { text: "seamless 데모 영상\n", options: { fontSize: 13, fontFace: F.bold, color: C.black } },
+    { text: "자동 커서가 기분→예산→추천→수락을 클릭으로 시연\n", options: { fontSize: 11, color: C.midGray } },
+    { text: "Playwright 녹화 → ffmpeg H.264 MP4\n\n", options: { fontSize: 11, color: C.midGray } },
+    { text: "재현 파이프라인\n", options: { fontSize: 12, fontFace: F.bold, color: APPLE.blue } },
+    { text: "npm run video  →  demo-todays-lunch-mate.mp4", options: { fontSize: 10, fontFace: F.code, color: C.darkGray } },
+  ], { x: 4.7, y: 1.6, w: 3.9, h: 3.2, margin: 0, lineSpacingMultiple: 1.35, valign: "top" });
+  addFooter(s, "파일: workshop/prototype/index.html (?demo=1 자동재생) · demo-todays-lunch-mate.mp4");
+}
+
+// ─── SLIDE 43: WORKFLOW SUMMARY ───
+{
+  const s = lightSlide();
+  addTitle(s, "정리 — 한 사람이 디자인부터 데모까지");
+  addSubtitle(s, "AI-Native PM은 레퍼런스 확보 → 토큰화 → 화면 설계 → 동작 → 시연을 끊김 없이 잇는다.");
+
+  const flow = [
+    ["DESIGN.md", "getdesign.md에서\nApple 토큰 .md 확보", C.accent],
+    ["Design Tokens", "JSON→CSS→JS\n앱 개발용 인프라", APPLE.blue],
+    ["Wireframe", "PRD 기반\nFigma 계층 보드", APPLE.sky],
+    ["Prototype", "토큰 적용\n동작 HTML", "1F883D"],
+    ["Demo MP4", "클릭 흐름\nseamless 녹화", "8B5CF6"],
+  ];
+  const bw = (L.cw - 0.3 * 4) / 5;
+  flow.forEach(([t, d, col], i) => {
+    const x = L.mx + i * (bw + 0.3);
+    addCard(s, x, 1.5, bw, 2.0, { bg: C.offWhite, leftAccent: col });
+    s.addText(`${i + 1}`, { x: x + 0.12, y: 1.62, w: bw - 0.24, h: 0.4, fontSize: 18, fontFace: F.title, color: col, margin: 0 });
+    s.addText(t, { x: x + 0.12, y: 2.1, w: bw - 0.24, h: 0.4, fontSize: 12.5, fontFace: F.title, color: C.black, margin: 0 });
+    s.addText(d, { x: x + 0.12, y: 2.55, w: bw - 0.24, h: 0.8, fontSize: 10, fontFace: F.body, color: C.midGray, margin: 0, lineSpacingMultiple: 1.25 });
+    if (i < 4) s.addText("→", { x: x + bw - 0.05, y: 1.5, w: 0.3, h: 2.0, fontSize: 16, color: C.midGray, align: "center", valign: "middle", margin: 0 });
+  });
+  addAccentFooter(s, "디자인 시스템은 공용 자산(docs/design-system/) — 다음 프로젝트도 같은 토큰으로 즉시 시작한다.");
+}
+
+// ─── SLIDE 44: CLOSING (Dark) ───
 {
   const s = darkSlide();
   s.addText("오늘 여러분이 만든 것", {
@@ -1609,8 +1874,8 @@ function addCard(s, x, y, w, h, opts = {}) {
 // ══════════════════════════════════════════════════════
 // GENERATE
 // ══════════════════════════════════════════════════════
-const path = require("path");
-const defaultOut = path.join(__dirname, "ai-native-pm-lecture.pptx");
+// (path already required in the design-system section above)
+const defaultOut = path.join(__dirname, "ai-native-pm-lecture-v04-20260626.pptx");
 const out = process.env.OUT || defaultOut;
 pres.writeFile({ fileName: out })
   .then(() => console.log("Created: " + out + " (" + pres.slides.length + " slides)"))

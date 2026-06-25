@@ -1,0 +1,89 @@
+/* ============================================================
+   AI-Native PM Design System — Design Tokens (CSS Custom Properties)
+   Apple-inspired. Generated from tokens.json (SSOT).
+   Import this first, then styles/base.css and styles/components.css.
+   ============================================================ */
+
+:root {
+  /* ── Color · Brand ───────────────────────────── */
+  --color-action-blue: #0066cc;
+  --color-focus-blue: #0071e3;
+  --color-sky-link-blue: #2997ff;
+
+  /* ── Color · Ink (text on light) ─────────────── */
+  --color-ink: #1d1d1f;
+  --color-ink-muted-80: #333333;
+  --color-ink-muted-48: #7a7a7a;
+
+  /* ── Color · Surface ─────────────────────────── */
+  --color-canvas: #ffffff;
+  --color-parchment: #f5f5f7;
+  --color-pearl: #fafafc;
+  --color-tile-1: #272729;
+  --color-tile-2: #2a2a2c;
+  --color-tile-3: #252527;
+  --color-black: #000000;
+  --color-chip-translucent: rgba(210, 210, 215, 0.64);
+
+  /* ── Color · Text ────────────────────────────── */
+  --color-on-primary: #ffffff;
+  --color-on-dark: #ffffff;
+  --color-body: #1d1d1f;
+  --color-body-muted: #cccccc;
+
+  /* ── Color · Line ────────────────────────────── */
+  --color-divider-soft: #f0f0f0;
+  --color-hairline: #e0e0e0;
+
+  /* ── Font Family ─────────────────────────────── */
+  --font-display: "SF Pro Display", system-ui, -apple-system, "Inter", sans-serif;
+  --font-text: "SF Pro Text", system-ui, -apple-system, "Inter", sans-serif;
+  --font-mono: "SF Mono", ui-monospace, Consolas, monospace;
+
+  /* ── Font Weight (ladder: 300/400/600/700 — 500 absent) ── */
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* ── Typography (size / line-height / tracking) ── */
+  --type-hero-size: 56px;   --type-hero-lh: 1.07;  --type-hero-ls: -0.28px;
+  --type-display-lg-size: 40px; --type-display-lg-lh: 1.1; --type-display-lg-ls: 0;
+  --type-display-md-size: 34px; --type-display-md-lh: 1.47; --type-display-md-ls: -0.374px;
+  --type-lead-size: 28px;   --type-lead-lh: 1.14;  --type-lead-ls: 0.196px;
+  --type-lead-airy-size: 24px; --type-lead-airy-lh: 1.5; --type-lead-airy-ls: 0;
+  --type-tagline-size: 21px; --type-tagline-lh: 1.19; --type-tagline-ls: 0.231px;
+  --type-body-strong-size: 17px; --type-body-strong-lh: 1.24; --type-body-strong-ls: -0.374px;
+  --type-body-size: 17px;   --type-body-lh: 1.47;  --type-body-ls: -0.374px;
+  --type-caption-size: 14px; --type-caption-lh: 1.43; --type-caption-ls: -0.224px;
+  --type-fine-size: 12px;   --type-fine-lh: 1.0;   --type-fine-ls: -0.12px;
+
+  /* ── Radius ──────────────────────────────────── */
+  --radius-none: 0px;
+  --radius-xs: 5px;
+  --radius-sm: 8px;
+  --radius-md: 11px;
+  --radius-lg: 18px;
+  --radius-pill: 9999px;
+  --radius-full: 9999px;
+
+  /* ── Spacing (base 8px) ──────────────────────── */
+  --space-xxs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 17px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-xxl: 48px;
+  --space-section: 80px;
+
+  /* ── Elevation (the single product shadow) ───── */
+  --shadow-product: 3px 5px 30px 0 rgba(0, 0, 0, 0.22);
+
+  /* ── Effects ─────────────────────────────────── */
+  --backdrop-blur: saturate(180%) blur(20px);
+  --press-scale: scale(0.95);
+}
+
+/* Breakpoints (for reference in @media — CSS vars can't be used in media queries):
+   small-phone 419 · phone 640 · tablet-portrait 734 · tablet-landscape 833 · small-desktop 1068 · desktop 1440 */

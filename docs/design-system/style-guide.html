@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI-Native PM Design System — Style Guide</title>
+<link rel="stylesheet" href="tokens/tokens.css" />
+<link rel="stylesheet" href="styles/reset.css" />
+<link rel="stylesheet" href="styles/base.css" />
+<link rel="stylesheet" href="styles/components.css" />
+<style>
+  body { padding: 0; }
+  .sg-wrap { max-width: 980px; margin: 0 auto; padding: 48px 24px 96px; }
+  .sg-head { display:flex; align-items:center; gap:16px; margin-bottom: 8px; }
+  .sg-head img { width: 44px; height: 44px; }
+  section { margin-top: 56px; }
+  h2.sg { font-family: var(--font-display); font-size: 28px; font-weight:600; letter-spacing:-0.5px; margin-bottom: 6px; }
+  .sg-sub { color: var(--color-ink-muted-48); font-size: 14px; margin-bottom: 20px; }
+  .swatches { display:grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 12px; }
+  .swatch { border:1px solid var(--color-hairline); border-radius: var(--radius-lg); overflow:hidden; }
+  .swatch .chip { height: 72px; }
+  .swatch .meta { padding: 10px 12px; }
+  .swatch .name { font-size: 13px; font-weight:600; }
+  .swatch .hex { font-size: 12px; color: var(--color-ink-muted-48); font-family: var(--font-mono); }
+  .row { display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+  .type-row { padding: 12px 0; border-bottom: 1px solid var(--color-divider-soft); }
+  .type-row .label { font-size:12px; color:var(--color-ink-muted-48); font-family:var(--font-mono); }
+  .icongrid { display:grid; grid-template-columns: repeat(auto-fill, minmax(90px,1fr)); gap: 12px; }
+  .icell { border:1px solid var(--color-hairline); border-radius: var(--radius-lg); padding:16px; text-align:center; color: var(--color-ink); }
+  .icell svg { width: 28px; height: 28px; margin: 0 auto 8px; }
+  .icell span { font-size: 11px; color: var(--color-ink-muted-48); }
+  .tiles { display:grid; grid-template-columns: 1fr 1fr; gap:0; border-radius: var(--radius-lg); overflow:hidden; border:1px solid var(--color-hairline); }
+  .tiles .ds-tile { padding: 40px 24px; }
+  .space-demo { display:flex; align-items:flex-end; gap:10px; }
+  .space-demo div { background: var(--color-action-blue); width: 28px; border-radius: 4px; }
+  .space-demo .lab { writing-mode: vertical-rl; color:white; font-size:9px; text-align:center; }
+</style>
+</head>
+<body>
+<div class="sg-wrap">
+  <div class="sg-head">
+    <img src="assets/app-icon.svg" alt="앱 아이콘" />
+    <div>
+      <div class="ds-display-md">AI-Native PM Design System</div>
+      <div class="sg-sub">Apple-inspired · tokens.json SSOT · v1.0.0 (2026-06-26)</div>
+    </div>
+  </div>
+  <p class="ds-body" style="color:var(--color-ink-muted-80); max-width:640px;">
+    단일 Action Blue 액센트, 사진 우선, near-invisible UI. 모든 값은 <code>tokens/tokens.json</code>에서 파생됩니다.
+  </p>
+
+  <section>
+    <h2 class="sg">Colors</h2>
+    <div class="sg-sub">브랜드 1색 원칙 — 모든 인터랙션은 Action Blue.</div>
+    <div class="swatches" id="swatches"></div>
+  </section>
+
+  <section>
+    <h2 class="sg">Typography</h2>
+    <div class="sg-sub">SF Pro Display(헤드라인 600) + SF Pro Text(본문 400/17px). 디스플레이 음수 트래킹.</div>
+    <div id="type"></div>
+  </section>
+
+  <section>
+    <h2 class="sg">Buttons</h2>
+    <div class="row" style="margin-bottom:16px;">
+      <button class="ds-btn ds-btn--primary">Buy</button>
+      <button class="ds-btn ds-btn--secondary">Learn more</button>
+      <button class="ds-btn ds-btn--hero">시작하기</button>
+      <button class="ds-btn ds-btn--pearl">옵션</button>
+    </div>
+    <div class="ds-bg-tile" style="padding:16px; border-radius:var(--radius-lg);" class="row">
+      <div class="row">
+        <button class="ds-btn ds-btn--dark">Sign In</button>
+        <button class="ds-btn ds-btn--icon" aria-label="닫기">✕</button>
+        <a class="ds-link--on-dark" href="#">다크 표면 인라인 링크 →</a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sg">Chips & Search</h2>
+    <div class="row" style="margin-bottom:14px;">
+      <button class="ds-chip">😊 기분좋음</button>
+      <button class="ds-chip ds-chip--selected">🔥 매운게땡김</button>
+      <button class="ds-chip">🥗 가볍게</button>
+    </div>
+    <div class="ds-search" style="max-width:360px;"><span>🔍</span><input placeholder="메뉴·식당 검색" /></div>
+  </section>
+
+  <section>
+    <h2 class="sg">Tiles (full-bleed, color = divider)</h2>
+    <div class="tiles">
+      <div class="ds-tile ds-tile--light"><div class="ds-display-lg">Light</div><div class="ds-caption">canvas #ffffff</div></div>
+      <div class="ds-tile ds-tile--dark"><div class="ds-display-lg">Dark</div><div class="ds-caption">tile-1 #272729</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sg">Card</h2>
+    <div class="ds-card" style="max-width:320px;">
+      <div class="ds-card__title">제육덮밥</div>
+      <div class="ds-caption" style="color:var(--color-ink-muted-48); margin:4px 0 10px;">맛있는집 · 도보 4분</div>
+      <div class="ds-card__price">8,000원</div>
+      <div class="row" style="margin-top:14px;">
+        <button class="ds-btn ds-btn--primary" style="flex:1;">수락</button>
+        <button class="ds-btn ds-btn--secondary">다시</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sg">Icons</h2>
+    <div class="icongrid" id="icons"></div>
+  </section>
+
+  <section>
+    <h2 class="sg">Radius & Spacing</h2>
+    <div class="row" style="margin-bottom:24px;">
+      <div style="width:80px;height:56px;background:var(--color-parchment);border:1px solid var(--color-hairline);border-radius:var(--radius-sm)"></div>
+      <div style="width:80px;height:56px;background:var(--color-parchment);border:1px solid var(--color-hairline);border-radius:var(--radius-md)"></div>
+      <div style="width:80px;height:56px;background:var(--color-parchment);border:1px solid var(--color-hairline);border-radius:var(--radius-lg)"></div>
+      <div style="width:120px;height:44px;background:var(--color-action-blue);border-radius:var(--radius-pill)"></div>
+    </div>
+    <div class="space-demo" id="space"></div>
+  </section>
+</div>
+
+<script type="module">
+import { color, typography, spacing } from './tokens/tokens.js';
+
+// swatches
+const flat = [];
+const push = (g) => Object.entries(g).forEach(([k,v]) => { if(typeof v==='string') flat.push([k,v]); else Object.entries(v).forEach(([kk,vv])=>flat.push([kk,vv])); });
+push(color);
+document.getElementById('swatches').innerHTML = flat.map(([n,hex]) =>
+  `<div class="swatch"><div class="chip" style="background:${hex}"></div><div class="meta"><div class="name">${n}</div><div class="hex">${hex}</div></div></div>`
+).join('');
+
+// typography
+const order = ['heroDisplay','displayLg','displayMd','lead','leadAiry','tagline','bodyStrong','body','caption','finePrint'];
+document.getElementById('type').innerHTML = order.map(k => {
+  const t = typography[k];
+  return `<div class="type-row"><div style="font-family:${t.family};font-size:${t.size};font-weight:${t.weight};line-height:${t.lineHeight};letter-spacing:${t.letterSpacing};">${k} — 오늘의 점심 메이트 AaGg 123</div><div class="label">${t.size} / ${t.weight} / lh ${t.lineHeight} / ls ${t.letterSpacing}</div></div>`;
+}).join('');
+
+// icons
+const manifest = await fetch('./icons/index.json').then(r=>r.json());
+const cells = await Promise.all(Object.entries(manifest.icons).map(async ([name, meta]) => {
+  const svg = await fetch('./icons/' + meta.file).then(r=>r.text());
+  return `<div class="icell">${svg}<span>${name}</span></div>`;
+}));
+document.getElementById('icons').innerHTML = cells.join('');
+
+// spacing
+const sp = [['xs',8],['sm',12],['md',17],['lg',24],['xl',32],['xxl',48]];
+document.getElementById('space').innerHTML = sp.map(([n,px]) =>
+  `<div style="height:${px*2}px"><span class="lab">${n} ${px}</span></div>`
+).join('');
+</script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+/* Components — AI-Native PM Design System (Apple grammar)
+   Requires tokens.css + base.css. All values reference tokens. */
+
+/* ── Buttons ─────────────────────────────────────────── */
+.ds-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-xs);
+  font-family: var(--font-text); font-size: var(--type-body-size); letter-spacing: var(--type-body-ls);
+  cursor: pointer; transition: transform 0.1s ease, background 0.15s ease;
+  border: none; white-space: nowrap;
+}
+.ds-btn:active { transform: var(--press-scale); }
+.ds-btn:focus-visible { outline: 2px solid var(--color-focus-blue); outline-offset: 2px; }
+
+/* Primary — signature blue pill */
+.ds-btn--primary {
+  background: var(--color-action-blue); color: var(--color-on-primary);
+  border-radius: var(--radius-pill); padding: 11px 22px;
+}
+/* Secondary — ghost pill */
+.ds-btn--secondary {
+  background: transparent; color: var(--color-action-blue);
+  border: 1px solid var(--color-action-blue);
+  border-radius: var(--radius-pill); padding: 10px 21px;
+}
+/* Dark utility (nav actions) */
+.ds-btn--dark {
+  background: var(--color-ink); color: var(--color-on-dark);
+  font-size: var(--type-caption-size); letter-spacing: var(--type-caption-ls);
+  border-radius: var(--radius-sm); padding: 8px 15px;
+}
+/* Pearl capsule (card secondary) */
+.ds-btn--pearl {
+  background: var(--color-pearl); color: var(--color-ink-muted-80);
+  font-size: var(--type-caption-size);
+  border: 3px solid var(--color-divider-soft); border-radius: var(--radius-md); padding: 8px 14px;
+}
+/* Store hero (large, rare weight 300) */
+.ds-btn--hero {
+  background: var(--color-action-blue); color: var(--color-on-primary);
+  font-size: 18px; font-weight: var(--weight-light);
+  border-radius: var(--radius-pill); padding: 14px 28px;
+}
+/* Full-width block (mobile) */
+.ds-btn--block { width: 100%; }
+
+/* Circular icon chip floating over photography */
+.ds-btn--icon {
+  width: 44px; height: 44px; border-radius: var(--radius-full);
+  background: var(--color-chip-translucent); color: var(--color-ink);
+  backdrop-filter: var(--backdrop-blur);
+}
+
+/* Text links */
+.ds-link { color: var(--color-action-blue); }
+.ds-link--on-dark { color: var(--color-sky-link-blue); }
+
+/* ── Navigation ──────────────────────────────────────── */
+.ds-global-nav {
+  display: flex; align-items: center; gap: var(--space-lg);
+  height: 44px; padding: 0 var(--space-lg);
+  background: var(--color-black); color: var(--color-on-dark);
+  font-size: var(--type-fine-size); letter-spacing: var(--type-fine-ls);
+}
+.ds-sub-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 52px; padding: 0 var(--space-lg);
+  background: color-mix(in srgb, var(--color-parchment) 80%, transparent);
+  backdrop-filter: var(--backdrop-blur);
+  color: var(--color-ink);
+}
+.ds-sub-nav__title { font-family: var(--font-display); font-size: var(--type-tagline-size); font-weight: var(--weight-semibold); letter-spacing: var(--type-tagline-ls); }
+
+/* ── Tiles (full-bleed, edge-to-edge, color = divider) ── */
+.ds-tile {
+  padding: var(--space-section) var(--space-lg);
+  border-radius: var(--radius-none);
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-md);
+}
+.ds-tile--light     { background: var(--color-canvas); color: var(--color-ink); }
+.ds-tile--parchment { background: var(--color-parchment); color: var(--color-ink); }
+.ds-tile--dark      { background: var(--color-tile-1); color: var(--color-on-dark); }
+.ds-tile--dark-2    { background: var(--color-tile-2); color: var(--color-on-dark); }
+.ds-tile--dark-3    { background: var(--color-tile-3); color: var(--color-on-dark); }
+
+/* ── Cards ───────────────────────────────────────────── */
+.ds-card {
+  background: var(--color-canvas);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+}
+.ds-card__title { font-size: var(--type-body-strong-size); font-weight: var(--weight-semibold); letter-spacing: var(--type-body-strong-ls); }
+.ds-card__price { font-size: var(--type-body-size); }
+
+/* Product image rests on surface — the only system shadow */
+.ds-product-img { box-shadow: var(--shadow-product); }
+
+/* ── Chips (configurator / option select) ────────────── */
+.ds-chip {
+  display: inline-flex; align-items: center; gap: var(--space-xs);
+  background: var(--color-canvas); color: var(--color-ink);
+  font-size: var(--type-caption-size);
+  border: 1px solid var(--color-hairline); border-radius: var(--radius-pill);
+  padding: 12px 16px; cursor: pointer; transition: border 0.15s ease, transform 0.1s ease;
+}
+.ds-chip:active { transform: var(--press-scale); }
+.ds-chip[aria-selected="true"], .ds-chip--selected {
+  border: 2px solid var(--color-focus-blue); padding: 11px 15px;
+}
+
+/* ── Search input (pill) ─────────────────────────────── */
+.ds-search {
+  display: flex; align-items: center; gap: var(--space-xs);
+  height: 44px; padding: 12px 20px;
+  background: var(--color-canvas); color: var(--color-ink);
+  border: 1px solid rgba(0,0,0,0.08); border-radius: var(--radius-pill);
+}
+.ds-search input { border: none; outline: none; width: 100%; background: transparent; }
+
+/* ── Floating sticky bar ─────────────────────────────── */
+.ds-sticky-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 64px; padding: 12px 32px;
+  background: color-mix(in srgb, var(--color-parchment) 80%, transparent);
+  backdrop-filter: var(--backdrop-blur);
+}
+
+/* ── Footer ──────────────────────────────────────────── */
+.ds-footer {
+  background: var(--color-parchment); color: var(--color-ink-muted-80);
+  padding: 64px var(--space-lg);
+}
+.ds-footer__legal { font-size: var(--type-fine-size); color: var(--color-ink-muted-48); }

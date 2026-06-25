@@ -1,0 +1,4 @@
+node_modules/
+.vid/
+package-lock.json
+.DS_Store

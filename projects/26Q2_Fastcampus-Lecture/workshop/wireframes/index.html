@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>오늘의 점심 메이트 — Wireframes (Figma-style board)</title>
+<!--
+  근거 PRD: projects/26Q2_Fastcampus-Lecture/prd/PRD.md (오늘의 점심 메이트)
+  디자인 시스템: docs/design-system/ (Apple-inspired tokens)
+  계층: Flow stage(그룹) → Screen frame(화면) → Component(컴포넌트)
+-->
+<style>
+  /* ── design tokens (inlined from docs/design-system/tokens) ── */
+  :root{
+    --action:#0066cc; --focus:#0071e3; --sky:#2997ff;
+    --ink:#1d1d1f; --ink80:#333; --ink48:#7a7a7a;
+    --canvas:#fff; --parchment:#f5f5f7; --pearl:#fafafc;
+    --tile:#272729; --hair:#e0e0e0; --divider:#f0f0f0;
+    --font-d:"SF Pro Display",system-ui,-apple-system,Inter,sans-serif;
+    --font-t:"SF Pro Text",system-ui,-apple-system,Inter,sans-serif;
+    --r-sm:8px; --r-md:11px; --r-lg:18px; --r-pill:9999px;
+    --shadow-product:3px 5px 30px rgba(0,0,0,.22);
+    /* figma canvas */
+    --fg-bg:#1a1a1c; --fg-panel:#232326; --fg-line:#3a3a3e; --fg-text:#e6e6ea; --fg-mut:#8a8a92;
+  }
+  *{box-sizing:border-box;margin:0;}
+  body{background:var(--fg-bg);
+    background-image:radial-gradient(circle, rgba(255,255,255,.05) 1px, transparent 1px);
+    background-size:22px 22px;
+    font-family:var(--font-t); color:var(--fg-text); padding:0 0 80px;}
+
+  /* top bar */
+  .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+    padding:14px 28px;background:rgba(20,20,22,.86);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--fg-line);}
+  .topbar h1{font-family:var(--font-d);font-size:18px;font-weight:600;letter-spacing:-.4px;}
+  .topbar .sub{color:var(--fg-mut);font-size:12px;margin-top:2px;}
+  .badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#cfe3ff;background:rgba(0,102,204,.18);
+    border:1px solid rgba(41,151,255,.4);padding:5px 10px;border-radius:var(--r-pill);}
+
+  .board{padding:40px 36px;}
+  .legend{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:34px;color:var(--fg-mut);font-size:12px;}
+  .legend b{color:var(--fg-text);}
+  .legend .k{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle;}
+
+  /* flow stage group */
+  .stage{margin-bottom:26px;}
+  .stage-head{display:flex;align-items:center;gap:10px;margin:10px 4px 16px;}
+  .stage-num{font-family:var(--font-d);font-weight:600;font-size:13px;color:#0a0a0a;background:var(--sky);
+    width:26px;height:26px;border-radius:7px;display:grid;place-items:center;}
+  .stage-title{font-family:var(--font-d);font-size:16px;font-weight:600;letter-spacing:-.3px;}
+  .stage-desc{color:var(--fg-mut);font-size:12px;}
+
+  /* flow row of frames + arrows */
+  .flow{display:flex;align-items:flex-start;gap:0;flex-wrap:wrap;}
+  .arrow{align-self:center;color:var(--sky);font-size:26px;margin:0 8px;flex:0 0 auto;opacity:.8;}
+
+  /* frame (figma node) */
+  .frame{flex:0 0 auto;}
+  .frame-label{display:flex;align-items:center;gap:8px;margin:0 2px 8px;}
+  .frame-label .id{font-size:10px;font-weight:700;color:#0a0a0a;background:#ffd60a;padding:2px 6px;border-radius:5px;}
+  .frame-label .nm{font-size:12.5px;color:var(--fg-text);font-weight:600;}
+  .frame-label .ftag{font-size:10px;color:var(--sky);border:1px solid rgba(41,151,255,.5);padding:1px 6px;border-radius:5px;}
+
+  /* phone device */
+  .phone{width:264px;height:548px;background:var(--canvas);border-radius:30px;overflow:hidden;position:relative;
+    border:1px solid var(--fg-line);box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:108px;height:22px;background:#000;border-radius:0 0 14px 14px;z-index:5;}
+  .status{height:38px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 18px 4px;font-size:11px;color:var(--ink);font-weight:600;}
+  .screen{height:calc(100% - 38px);overflow:hidden;color:var(--ink);font-family:var(--font-t);position:relative;}
+
+  /* screen content kit (design-system components, miniaturized) */
+  .pad{padding:16px;}
+  .h-title{font-family:var(--font-d);font-weight:600;letter-spacing:-.5px;line-height:1.1;}
+  .t-32{font-size:25px;} .t-22{font-size:19px;} .t-17{font-size:15px;} .t-14{font-size:12.5px;} .t-12{font-size:11px;}
+  .mut{color:var(--ink48);} .mut80{color:var(--ink80);}
+  .btn{display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--font-t);font-size:14px;border:none;cursor:default;}
+  .btn-primary{background:var(--action);color:#fff;border-radius:var(--r-pill);padding:11px 18px;}
+  .btn-ghost{background:transparent;color:var(--action);border:1px solid var(--action);border-radius:var(--r-pill);padding:10px 16px;}
+  .btn-block{width:100%;}
+  .chip{display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--canvas);border:1px solid var(--hair);
+    border-radius:var(--r-lg);padding:12px 8px;font-size:12px;color:var(--ink);}
+  .chip.sel{border:2px solid var(--focus);}
+  .chip .emo{font-size:22px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+  .pill-opt{border:1px solid var(--hair);border-radius:var(--r-pill);padding:10px;text-align:center;font-size:12.5px;}
+  .pill-opt.sel{border:2px solid var(--focus);font-weight:600;}
+  .card{background:var(--canvas);border:1px solid var(--hair);border-radius:var(--r-lg);padding:12px;}
+  .card .img{height:64px;border-radius:var(--r-sm);background:linear-gradient(135deg,#fde68a,#fca5a5);margin-bottom:8px;}
+  .card.c2 .img{background:linear-gradient(135deg,#bbf7d0,#86efac);}
+  .card.c3 .img{background:linear-gradient(135deg,#bfdbfe,#a5b4fc);}
+  .navbar{height:34px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;letter-spacing:-.2px;}
+  .subnav{height:40px;background:rgba(245,245,247,.85);display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--divider);}
+  .center{display:flex;flex-direction:column;align-items:center;text-align:center;}
+  .spinner{width:46px;height:46px;border-radius:50%;border:4px solid var(--divider);border-top-color:var(--action);}
+  .map{height:150px;border-radius:var(--r-lg);background:
+     linear-gradient(0deg,rgba(0,102,204,.08),rgba(0,102,204,.08)),
+     repeating-linear-gradient(0deg,#eef0f3 0 22px,#e6e9ee 22px 24px),
+     repeating-linear-gradient(90deg,#eef0f3 0 22px,#e6e9ee 22px 24px);position:relative;}
+  .map .pin{position:absolute;left:50%;top:46%;transform:translate(-50%,-100%);color:var(--action);font-size:24px;}
+  .ann{margin:10px 2px 0;color:var(--fg-mut);font-size:11px;max-width:264px;line-height:1.45;}
+  .tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+  .ds-tag{font-size:9.5px;color:var(--fg-mut);background:var(--fg-panel);border:1px solid var(--fg-line);padding:2px 6px;border-radius:5px;}
+  .footer-note{margin:30px 36px 0;color:var(--fg-mut);font-size:12px;border-top:1px solid var(--fg-line);padding-top:18px;line-height:1.6;}
+  .seg{display:flex;background:var(--parchment);border-radius:var(--r-pill);padding:3px;font-size:11px;}
+  .seg b{flex:1;text-align:center;padding:6px;border-radius:var(--r-pill);}
+  .seg b.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.1);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div>
+    <h1>오늘의 점심 메이트 — Wireframes</h1>
+    <div class="sub">PRD 기반 화면 설계 · Figma-style hierarchical board · 진입 → 기분 → 예산 → 선호 → AI추천 → 결과 → 상세</div>
+  </div>
+  <div class="badge">● Apple Design System · tokens.json</div>
+</div>
+
+<div class="board">
+  <div class="legend">
+    <span><span class="k" style="background:#ffd60a"></span><b>Frame</b> = 화면 (Screen)</span>
+    <span><span class="k" style="background:#2997ff"></span><b>Flow stage</b> = 사용자 흐름 단계</span>
+    <span><span class="k" style="background:#0066cc"></span><b>F-id</b> = PRD 기능 매핑</span>
+    <span>↳ 각 프레임 하단 <b>ds-tag</b> = 사용된 디자인 시스템 컴포넌트</span>
+  </div>
+
+  <!-- STAGE 1: 진입 -->
+  <div class="stage">
+    <div class="stage-head"><div class="stage-num">1</div>
+      <div><div class="stage-title">진입 & 온보딩</div><div class="stage-desc">앱을 열고 위치 권한을 허용한다 (F5)</div></div>
+    </div>
+    <div class="flow">
+      <!-- Splash -->
+      <div class="frame">
+        <div class="frame-label"><span class="id">01</span><span class="nm">Splash</span></div>
+        <div class="phone"><div class="notch"></div>
+          <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+          <div class="screen ds-bg" style="background:var(--parchment);">
+            <div class="center" style="height:100%;justify-content:center;gap:14px;">
+              <div style="width:84px;height:84px;border-radius:22px;background:var(--canvas);display:grid;place-items:center;box-shadow:var(--shadow-product);">
+                <div style="width:54px;height:30px;background:var(--action);border-radius:0 0 27px 27px;position:relative;">
+                  <div style="position:absolute;top:-6px;left:7px;right:7px;height:12px;background:var(--focus);border-radius:50%;"></div>
+                </div>
+              </div>
+              <div class="h-title t-22">오늘의 점심 메이트</div>
+              <div class="t-12 mut">기분으로 고르는 AI 점심 추천</div>
+            </div>
+          </div>
+        </div>
+        <div class="tag-row"><span class="ds-tag">app-icon</span><span class="ds-tag">surface/parchment</span><span class="ds-tag">shadow/product</span></div>
+      </div>
+      <div class="arrow">→</div>
+      <!-- Location permission -->
+      <div class="frame">
+        <div class="frame-label"><span class="id">02</span><span class="nm">위치 허용</span><span class="ftag">F5</span></div>
+        <div class="phone"><div class="notch"></div>
+          <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+          <div class="screen">
+            <div class="center" style="height:100%;justify-content:center;gap:12px;padding:20px;">
+              <div style="font-size:40px;color:var(--action);">◉</div>
+              <div class="h-title t-17">근처 식당을 찾을게요</div>
+              <div class="t-12 mut" style="line-height:1.5;">현재 위치 반경 500m 내에서<br/>걸어갈 수 있는 식당만 추천해요</div>
+              <button class="btn btn-primary btn-block" style="margin-top:10px;">위치 허용하기</button>
+              <button class="btn btn-ghost btn-block">주소 직접 입력</button>
+            </div>
+          </div>
+        </div>
+        <div class="tag-row"><span class="ds-tag">btn/primary·pill</span><span class="ds-tag">btn/secondary</span><span class="ds-tag">icon/location</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 2: 입력 -->
+  <div class="stage">
+    <div class="stage-head"><div class="stage-num">2</div>
+      <div><div class="stage-title">조건 입력</div><div class="stage-desc">기분(F1) → 예산(F2) → 선호 카테고리. 3-탭으로 끝나는 입력</div></div>
+    </div>
+    <div class="flow">
+      <!-- mood -->
+      <div class="frame">
+        <div class="frame-label"><span class="id">03</span><span class="nm">기분 선택</span><span class="ftag">F1</span></div>
+        <div class="phone"><div class="notch"></div>
+          <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+          <div class="navbar">오늘의 점심 메이트</div>
+          <div class="screen">
+            <div class="pad">
+              <div class="t-12 mut">1 / 3 단계</div>
+              <div class="h-title t-22" style="margin:6px 0 14px;">지금 기분이<br/>어떠세요?</div>
+              <div class="grid2" style="gap:10px;">
+                <div class="chip sel"><span class="emo">😊</span>기분좋음</div>
+                <div class="chip"><span class="emo">😫</span>지침</div>
+                <div class="chip"><span class="emo">🔥</span>매운게땡김</div>
+                <div class="chip"><span class="emo">🥗</span>가볍게</div>
+                <div class="chip" style="grid-column:span 2;"><span class="emo">🎉</span>특별한 날</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tag-row"><span class="ds-tag">chip×5 (mood)</span><span class="ds-tag">global-nav</span><span class="ds-tag">type/display</span></div>
+      </div>
+      <div class="arrow">→</div>
+      <!-- budget -->
+      <div class="frame">
+        <div class="frame-label"><span class="id">04</span><span class="nm">예산 설정</span><span class="ftag">F2</span></div>
+        <div class="phone"><div class="notch"></div>
+          <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+          <div class="navbar">오늘의 점심 메이트</div>
+          <div class="screen">
+            <div class="pad">
+              <div class="t-12 mut">2 / 3 단계</div>
+              <div class="h-title t-22" style="margin:6px 0 14px;">예산은<br/>얼마인가요?</div>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div class="pill-opt">₩ 8,000원 이하</div>
+                <div class="pill-opt sel">₩ 8,000 ~ 15,000원</div>
+                <div class="pill-opt">₩ 15,000원 이상</div>
+              </div>
+              <button class="btn btn-primary btn-block" style="margin-top:18px;">다음</button>
+            </div>
+          </div>
+        </div>
+        <div class="tag-row"><span class="ds-tag">pill-opt×3</span><span class="ds-tag">btn/primary</span><span class="ds-tag">icon/budget</span></div>
+      </div>
+      <div class="arrow">→</div>
+      <!-- preference -->
+      <div class="frame">
+        <div class="frame-label"><span class="id">05</span><span class="nm">선호 카테고리</span></div>
+        <div class="phone"><div class="notch"></div>
+          <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+          <div class="navbar">오늘의 점심 메이트</div>
+          <div class="screen">
+            <div class="pad">
+              <div class="t-12 mut">3 / 3 단계 · 선택</div>
+              <div class="h-title t-22" style="margin:6px 0 14px;">피하고 싶은<br/>음식 있어요?</div>
+              <div class="grid3">
+                <div class="pill-opt sel">한식</div><div class="pill-opt">일식</div><div class="pill-opt">중식</div>
+                <div class="pill-opt">양식</div><div class="pill-opt sel">분식</div><div class="pill-opt">아시안</div>
+              </div>
+              <button class="btn btn-primary btn-block" style="margin-top:18px;">추천받기 ✨</button>
+            </div>
+          </div>
+        </div>
+        <div class="tag-row"><span class="ds-tag">grid/3-col chips</span><span class="ds-tag">btn/primary</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 3: AI 추천 -->
+  <div class="stage">
+    <div class="stage-head"><div class="stage-num">3</div>
+      <div><div class="stage-title">AI 추천 생성</div><div class="stage-desc">Claude Haiku가 기분+예산+위치로 메뉴 3개 생성 (F3, p95 &lt; 2초)</div></div>
+    </div>
+    <div class="flow">
+      <!-- loading -->
+      <div class="frame">
+        <div class="frame-label"><span class="id">06</span><span class="nm">추천 로딩</span><span class="ftag">F3</span></div>
+        <div class="phone"><div class="notch"></div>
+          <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+          <div class="screen ds-bg" style="background:var(--tile);color:#fff;">
+            <div class="center" style="height:100%;justify-content:center;gap:18px;">
+              <div class="spinner"></div>
+              <div class="h-title t-17" style="color:#fff;">AI가 메뉴를<br/>고르고 있어요</div>
+              <div class="t-12" style="color:var(--sky);">기분좋음 · 8–15천원 · 강남 500m</div>
+            </div>
+          </div>
+        </div>
+        <div class="tag-row"><span class="ds-tag">surface/tile-dark</span><span class="ds-tag">link/on-dark</span><span class="ds-tag">spinner</span></div>
+      </div>
+      <div class="arrow">→</div>
+      <!-- results -->
+      <div class="frame">
+        <div class="frame-label"><span class="id">07</span><span class="nm">추천 결과 3카드</span><span class="ftag">F3·F4</span></div>
+        <div class="phone"><div class="notch"></div>
+          <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+          <div class="subnav"><b class="t-14" style="font-weight:600;">추천 결과</b><span class="t-12" style="color:var(--action);">다시 ↻</span></div>
+          <div class="screen" style="background:var(--parchment);">
+            <div class="pad" style="display:flex;flex-direction:column;gap:10px;">
+              <div class="card">
+                <div class="img"></div>
+                <div class="t-14" style="font-weight:600;">제육덮밥 <span class="t-12 mut">· 한식</span></div>
+                <div class="t-12 mut">맛있는집 · 도보 4분 · 8,500원</div>
+                <div class="t-12" style="color:var(--ink80);margin-top:4px;">"지친 오후엔 든든한 제육 한 그릇"</div>
+              </div>
+              <div class="card c2">
+                <div class="img"></div>
+                <div class="t-14" style="font-weight:600;">연어 포케 <span class="t-12 mut">· 샐러드</span></div>
+                <div class="t-12 mut">포케데이 · 도보 6분 · 12,000원</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tag-row"><span class="ds-tag">card×3</span><span class="ds-tag">sub-nav/frosted</span><span class="ds-tag">icon/refresh·walk</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 4: 결정 -->
+  <div class="stage">
+    <div class="stage-head"><div class="stage-num">4</div>
+      <div><div class="stage-title">결정 & 출발</div><div class="stage-desc">수락/거절 피드백 수집(F4) → 지도 연결. 인기 메뉴로 선택 보조(F6)</div></div>
+    </div>
+    <div class="flow">
+      <!-- detail / accept -->
+      <div class="frame">
+        <div class="frame-label"><span class="id">08</span><span class="nm">상세 & 수락</span><span class="ftag">F4</span></div>
+        <div class="phone"><div class="notch"></div>
+          <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+          <div class="screen">
+            <div class="map"><div class="pin">◉</div></div>
+            <div class="pad" style="padding-top:12px;">
+              <div class="h-title t-22">제육덮밥</div>
+              <div class="t-12 mut" style="margin:4px 0 8px;">맛있는집 · ★ 4.6 · 도보 4분 (320m)</div>
+              <div class="t-14 mut80">8,500원 · 한식 · 점심 영업중</div>
+              <div style="display:flex;gap:8px;margin-top:14px;">
+                <button class="btn btn-primary" style="flex:1;">수락 · 길찾기</button>
+                <button class="btn btn-ghost">✕</button>
+                <button class="btn btn-ghost">↻</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tag-row"><span class="ds-tag">map</span><span class="ds-tag">btn/primary·icon</span><span class="ds-tag">icon/check·close·refresh</span></div>
+      </div>
+      <div class="arrow">→</div>
+      <!-- popular -->
+      <div class="frame">
+        <div class="frame-label"><span class="id">09</span><span class="nm">오늘의 인기 메뉴</span><span class="ftag">F6</span></div>
+        <div class="phone"><div class="notch"></div>
+          <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+          <div class="subnav"><b class="t-14" style="font-weight:600;">강남 인기 Top 3</b><span class="t-12 mut">실시간</span></div>
+          <div class="screen">
+            <div class="pad" style="display:flex;flex-direction:column;gap:10px;">
+              <div class="seg"><b class="on">내 추천</b><b>인기</b></div>
+              <div class="card" style="display:flex;gap:10px;align-items:center;padding:10px;">
+                <div style="font-size:18px;color:var(--action);font-weight:700;">1</div>
+                <div><div class="t-14" style="font-weight:600;">김치찌개</div><div class="t-12 mut">★ 4.7 · 320명 선택</div></div>
+              </div>
+              <div class="card" style="display:flex;gap:10px;align-items:center;padding:10px;">
+                <div style="font-size:18px;color:var(--ink48);font-weight:700;">2</div>
+                <div><div class="t-14" style="font-weight:600;">돈카츠</div><div class="t-12 mut">★ 4.5 · 280명 선택</div></div>
+              </div>
+              <div class="card" style="display:flex;gap:10px;align-items:center;padding:10px;">
+                <div style="font-size:18px;color:var(--ink48);font-weight:700;">3</div>
+                <div><div class="t-14" style="font-weight:600;">쌀국수</div><div class="t-12 mut">★ 4.5 · 240명 선택</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tag-row"><span class="ds-tag">segmented</span><span class="ds-tag">card/list</span><span class="ds-tag">icon/star</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <b style="color:var(--fg-text)">계층 구조</b> — Flow stage(4) → Screen frame(9) → Component(디자인 시스템 토큰·컴포넌트).
+    모든 화면은 <code style="color:var(--sky)">docs/design-system/</code>의 토큰(Action Blue·17px 본문·pill CTA·tile 교차)을 따른다.
+    이 와이어프레임을 입력으로 <code style="color:var(--sky)">workshop/prototype/</code> 동작 프로토타입과 데모 영상을 제작했다.
+  </div>
+</div>
+</body>
+</html>

@@ -15,3 +15,6 @@
 
 # Node
 node_modules/
+
+# PowerPoint/Office temp lock files
+~$*
