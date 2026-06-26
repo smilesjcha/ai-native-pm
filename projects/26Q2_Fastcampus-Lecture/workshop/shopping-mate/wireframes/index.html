@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Shopping Mate — Wireframes (User Flow board)</title>
+<!-- 근거 PRD: prd/PRD-shopping-mate.md · 디자인 시스템: docs/design-system/ -->
+<style>
+  :root{
+    --action:#0066cc; --focus:#0071e3; --sky:#2997ff; --rocket:#1769ff; --price:#e02020;
+    --ink:#1d1d1f; --ink48:#7a7a7a; --canvas:#fff; --parchment:#f5f5f7; --tile:#1d1d1f; --hair:#e0e0e0; --divider:#f0f0f0;
+    --font-d:"SF Pro Display",system-ui,-apple-system,Inter,sans-serif; --font-t:"SF Pro Text",system-ui,-apple-system,Inter,sans-serif;
+    --r-sm:8px; --r-lg:18px; --r-pill:9999px;
+    --fg-bg:#1a1a1c; --fg-panel:#232326; --fg-line:#3a3a3e; --fg-text:#e6e6ea; --fg-mut:#8a8a92;
+  }
+  *{box-sizing:border-box;margin:0;}
+  body{background:var(--fg-bg);background-image:radial-gradient(circle, rgba(255,255,255,.05) 1px, transparent 1px);background-size:22px 22px;
+    font-family:var(--font-t);color:var(--fg-text);padding:0 0 80px;}
+  .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:14px 28px;
+    background:rgba(20,20,22,.86);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--fg-line);}
+  .topbar h1{font-family:var(--font-d);font-size:18px;font-weight:600;letter-spacing:-.4px;}
+  .topbar .sub{color:var(--fg-mut);font-size:12px;margin-top:2px;}
+  .badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#cfe3ff;background:rgba(0,102,204,.18);border:1px solid rgba(41,151,255,.4);padding:5px 10px;border-radius:var(--r-pill);}
+  .board{padding:40px 36px;}
+  .legend{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:30px;color:var(--fg-mut);font-size:12px;}
+  .legend .k{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle;}
+  .stage{margin-bottom:26px;}
+  .stage-head{display:flex;align-items:center;gap:10px;margin:10px 4px 16px;}
+  .stage-num{font-family:var(--font-d);font-weight:600;font-size:13px;color:#0a0a0a;background:var(--sky);width:26px;height:26px;border-radius:7px;display:grid;place-items:center;}
+  .stage-title{font-family:var(--font-d);font-size:16px;font-weight:600;letter-spacing:-.3px;}
+  .stage-desc{color:var(--fg-mut);font-size:12px;}
+  .flow{display:flex;align-items:flex-start;flex-wrap:wrap;}
+  .arrow{align-self:center;color:var(--sky);font-size:26px;margin:0 8px;opacity:.8;}
+  .frame-label{display:flex;align-items:center;gap:8px;margin:0 2px 8px;}
+  .frame-label .id{font-size:10px;font-weight:700;color:#0a0a0a;background:#ffd60a;padding:2px 6px;border-radius:5px;}
+  .frame-label .nm{font-size:12.5px;color:var(--fg-text);font-weight:600;}
+  .frame-label .ftag{font-size:10px;color:var(--sky);border:1px solid rgba(41,151,255,.5);padding:1px 6px;border-radius:5px;}
+  .phone{width:264px;height:548px;background:var(--canvas);border-radius:30px;overflow:hidden;position:relative;border:1px solid var(--fg-line);box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:108px;height:22px;background:#000;border-radius:0 0 14px 14px;z-index:5;}
+  .status{height:38px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 18px 4px;font-size:11px;color:var(--ink);font-weight:600;}
+  .screen{height:calc(100% - 38px);overflow:hidden;color:var(--ink);position:relative;}
+  .pad{padding:14px;}
+  .h-title{font-family:var(--font-d);font-weight:600;letter-spacing:-.5px;line-height:1.1;}
+  .t-26{font-size:21px;} .t-17{font-size:15px;} .t-14{font-size:12.5px;} .t-12{font-size:11px;}
+  .mut{color:var(--ink48);} .center{display:flex;flex-direction:column;align-items:center;text-align:center;}
+  .btn{display:flex;align-items:center;justify-content:center;font-size:13px;border-radius:var(--r-pill);padding:11px;}
+  .btn-primary{background:var(--action);color:#fff;} .btn-block{width:100%;}
+  .navbar{height:34px;background:rgba(245,245,247,.9);display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:11px;font-weight:600;border-bottom:1px solid var(--divider);}
+  .bubble{max-width:80%;padding:9px 12px;border-radius:14px;font-size:12px;margin-bottom:8px;}
+  .bubble.ai{background:var(--parchment);border-bottom-left-radius:4px;} .bubble.me{background:var(--action);color:#fff;border-bottom-right-radius:4px;margin-left:auto;}
+  .chip{display:inline-block;border:1px solid var(--hair);border-radius:var(--r-pill);padding:6px 10px;font-size:11px;margin:0 4px 4px 0;}
+  .chip.sel{border:2px solid var(--focus);font-weight:600;}
+  .pcard{background:#fff;border:1px solid var(--hair);border-radius:var(--r-lg);padding:9px;margin-bottom:8px;display:flex;gap:9px;}
+  .thumb{width:54px;height:54px;border-radius:10px;flex:0 0 54px;}
+  .t1{background:linear-gradient(135deg,#cfe0ff,#9bb8ff);} .t2{background:linear-gradient(135deg,#d6f5e0,#9be3b4);} .t3{background:linear-gradient(135deg,#ffe1c2,#ffc08a);}
+  .price{font-weight:700;font-size:13px;} .price b{color:var(--price);}
+  .rocket{color:var(--rocket);font-weight:700;font-size:10px;}
+  .spinner{width:42px;height:42px;border-radius:50%;border:4px solid var(--divider);border-top-color:var(--action);}
+  .cmp{display:grid;grid-template-columns:1.1fr 1fr 1fr;font-size:10px;}
+  .cmp div{padding:5px 4px;border-bottom:1px solid var(--divider);text-align:center;}
+  .cmp .lab{text-align:left;font-weight:600;color:var(--ink48);} .cmp .win{color:var(--action);font-weight:700;background:#f2f8ff;}
+  .tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+  .ds-tag{font-size:9.5px;color:var(--fg-mut);background:var(--fg-panel);border:1px solid var(--fg-line);padding:2px 6px;border-radius:5px;}
+  .footer-note{margin:30px 36px 0;color:var(--fg-mut);font-size:12px;border-top:1px solid var(--fg-line);padding-top:18px;line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div><h1>Shopping Mate — Wireframes</h1>
+    <div class="sub">PRD 기반 User Flow 시안 · 진입 → 의도 → AI 후보 3 → 비교 → 상세 → 담기</div></div>
+  <div class="badge">● Apple Design System · tokens.json</div>
+</div>
+<div class="board">
+  <div class="legend">
+    <span><span class="k" style="background:#ffd60a"></span>Frame = 화면</span>
+    <span><span class="k" style="background:#2997ff"></span>Flow stage = User Flow 단계</span>
+    <span><span class="k" style="background:#0066cc"></span>F-id = PRD 기능</span>
+    <span>↳ ds-tag = 디자인 시스템 컴포넌트</span>
+  </div>
+
+  <!-- STAGE 1 -->
+  <div class="stage">
+    <div class="stage-head"><div class="stage-num">1</div><div><div class="stage-title">진입 & 의도</div><div class="stage-desc">앱 진입 → 대화형으로 의도(예산·용도·제약) 입력 (F-01)</div></div></div>
+    <div class="flow">
+      <div><div class="frame-label"><span class="id">01</span><span class="nm">Splash</span></div>
+        <div class="phone"><div class="notch"></div><div class="status"><span>9:41</span><span>●●● ▮</span></div>
+          <div class="screen" style="background:var(--parchment);"><div class="center" style="height:100%;justify-content:center;gap:12px;">
+            <div style="width:74px;height:74px;border-radius:20px;background:#fff;display:grid;place-items:center;box-shadow:3px 5px 30px rgba(0,0,0,.18);"><div style="width:34px;height:32px;border:4px solid var(--action);border-radius:0 0 10px 10px;position:relative;"><div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:18px;height:18px;border:4px solid var(--action);border-bottom:none;border-radius:11px 11px 0 0;"></div></div></div>
+            <div class="h-title t-26">Shopping Mate</div><div class="t-12 mut">사고 싶은 걸 말하면, 딱 3개만</div></div></div></div>
+        <div class="tag-row"><span class="ds-tag">app-icon</span><span class="ds-tag">surface/parchment</span></div></div>
+      <div class="arrow">→</div>
+      <div><div class="frame-label"><span class="id">02</span><span class="nm">의도 입력 (대화)</span><span class="ftag">F-01</span></div>
+        <div class="phone"><div class="notch"></div><div class="status"><span>9:41</span><span>●●● ▮</span></div>
+          <div class="screen"><div class="pad">
+            <div class="t-12 mut">의도를 알려주세요</div>
+            <div style="margin-top:10px;"><div class="bubble ai">무엇을 찾으세요? 예산·용도를 알려주세요 🙂</div><div class="bubble me">5만원대 무선 이어폰, 운동용</div></div>
+            <div class="t-12 mut" style="margin-top:4px;">빠른 조건</div>
+            <div style="margin-top:6px;"><span class="chip sel">운동용</span><span class="chip">노이즈캔슬</span><span class="chip sel">5만원대</span><span class="chip">방수</span></div>
+            <div style="border:1px solid var(--hair);border-radius:var(--r-pill);padding:8px 12px;margin-top:14px;font-size:11px;color:var(--ink48);">메시지 입력…  ↑</div>
+            <div class="btn btn-primary btn-block" style="margin-top:10px;">이 조건으로 추천받기</div>
+          </div></div></div>
+        <div class="tag-row"><span class="ds-tag">chat bubble</span><span class="ds-tag">chip×N</span><span class="ds-tag">btn/primary</span></div></div>
+    </div>
+  </div>
+
+  <!-- STAGE 2 -->
+  <div class="stage">
+    <div class="stage-head"><div class="stage-num">2</div><div><div class="stage-title">AI 후보 생성</div><div class="stage-desc">의도 기반으로 후보 3개 + 결정 근거 카드 (F-02, p95 &lt; 2초)</div></div></div>
+    <div class="flow">
+      <div><div class="frame-label"><span class="id">03</span><span class="nm">로딩</span><span class="ftag">F-02</span></div>
+        <div class="phone"><div class="notch"></div><div class="status"><span>9:41</span><span>●●● ▮</span></div>
+          <div class="screen" style="background:var(--tile);color:#fff;"><div class="center" style="height:100%;justify-content:center;gap:16px;">
+            <div class="spinner"></div><div class="h-title t-17" style="color:#fff;">상품을 비교하고<br/>있어요</div>
+            <div style="font-size:11px;color:var(--sky);">운동용 · 5만원대 · 리뷰 4.5+</div></div></div></div>
+        <div class="tag-row"><span class="ds-tag">surface/tile-dark</span><span class="ds-tag">spinner</span></div></div>
+      <div class="arrow">→</div>
+      <div><div class="frame-label"><span class="id">04</span><span class="nm">후보 3 카드</span><span class="ftag">F-02·F-05</span></div>
+        <div class="phone"><div class="notch"></div><div class="status"><span>9:41</span><span>●●● ▮</span></div>
+          <div class="navbar"><span>추천 3</span><span style="color:var(--action);">다시 ↻</span></div>
+          <div class="screen" style="background:var(--parchment);"><div class="pad">
+            <div class="pcard"><div class="thumb t1"></div><div><div style="font-size:9px;font-weight:700;background:var(--action);color:#fff;display:inline-block;padding:1px 6px;border-radius:6px;">AI 1위</div><div class="t-14" style="font-weight:600;">에어핏 프로 2</div><div class="price"><b>49,900원</b></div><div class="rocket">🚀 ★4.7 (1,204)</div></div></div>
+            <div class="pcard"><div class="thumb t2"></div><div><div class="t-14" style="font-weight:600;">사운드핏 액티브</div><div class="price"><b>43,000원</b></div><div class="rocket">🚀 ★4.5 (860)</div></div></div>
+            <div class="pcard"><div class="thumb t3"></div><div><div class="t-14" style="font-weight:600;">비트버즈 스포츠</div><div class="price"><b>52,000원</b></div><div class="rocket">🚀 ★4.6 (2,031)</div></div></div>
+          </div></div></div>
+        <div class="tag-row"><span class="ds-tag">product card×3</span><span class="ds-tag">sub-nav/frosted</span><span class="ds-tag">badge</span></div></div>
+    </div>
+  </div>
+
+  <!-- STAGE 3 -->
+  <div class="stage">
+    <div class="stage-head"><div class="stage-num">3</div><div><div class="stage-title">비교 & 결정</div><div class="stage-desc">3개 차이 하이라이트 비교 → 선택 (F-03)</div></div></div>
+    <div class="flow">
+      <div><div class="frame-label"><span class="id">05</span><span class="nm">비교 보기</span><span class="ftag">F-03</span></div>
+        <div class="phone"><div class="notch"></div><div class="status"><span>9:41</span><span>●●● ▮</span></div>
+          <div class="navbar"><span>비교</span><span class="mut">← 목록</span></div>
+          <div class="screen"><div class="pad">
+            <div class="cmp">
+              <div></div><div style="font-weight:700;">에어핏</div><div style="font-weight:700;">사운드핏</div>
+              <div class="lab">가격</div><div class="win">49,900</div><div>43,000</div>
+              <div class="lab">리뷰</div><div class="win">★4.7</div><div>★4.5</div>
+              <div class="lab">방수</div><div class="win">IPX5</div><div>IPX4</div>
+              <div class="lab">배터리</div><div>6h</div><div class="win">8h</div>
+            </div>
+            <div style="background:var(--parchment);border-radius:10px;padding:9px;margin-top:10px;font-size:11px;color:var(--ink48);">"운동·방수·리뷰 우선이면 에어핏 프로 2"</div>
+            <div class="btn btn-primary btn-block" style="margin-top:12px;">에어핏 프로 2 선택</div>
+          </div></div></div>
+        <div class="tag-row"><span class="ds-tag">compare table</span><span class="ds-tag">callout</span></div></div>
+    </div>
+  </div>
+
+  <!-- STAGE 4 -->
+  <div class="stage">
+    <div class="stage-head"><div class="stage-num">4</div><div><div class="stage-title">상세 & 담기</div><div class="stage-desc">결정 근거와 함께 장바구니 (F-04·F-05) → 재방문 시 맥락 복원</div></div></div>
+    <div class="flow">
+      <div><div class="frame-label"><span class="id">06</span><span class="nm">상세 + 담기</span><span class="ftag">F-04·F-05</span></div>
+        <div class="phone"><div class="notch"></div><div class="status"><span>9:41</span><span>●●● ▮</span></div>
+          <div class="screen"><div class="pad">
+            <div class="hero t1" style="height:120px;border-radius:var(--r-lg);"></div>
+            <div class="t-17" style="font-weight:700;margin-top:8px;">에어핏 프로 2 (운동용)</div>
+            <div class="t-12 mut">★4.7 (1,204) · IPX5 · 배터리 6h</div>
+            <div class="price" style="font-size:17px;"><b>49,900원</b></div>
+            <div class="rocket" style="font-size:11px;">🚀 내일(수) 도착 · 무료배송</div>
+            <div style="background:var(--parchment);border-radius:10px;padding:9px;margin-top:10px;font-size:11px;color:var(--ink48);">"운동·5만원 이하·리뷰 4.5+ 조건에 최적"</div>
+            <div class="btn btn-primary btn-block" style="margin-top:12px;">장바구니 담기</div>
+          </div></div></div>
+        <div class="tag-row"><span class="ds-tag">hero</span><span class="ds-tag">btn/primary</span><span class="ds-tag">근거 저장</span></div></div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <b style="color:var(--fg-text)">계층</b> — User Flow stage(4) → Screen frame(6) → Component(디자인 시스템 토큰). 모든 화면은
+    <code style="color:var(--sky)">docs/design-system/</code> 토큰(Action Blue·17px 본문·pill CTA·로켓배송 컬러)을 따른다.
+    이 시안을 입력으로 <code style="color:var(--sky)">workshop/shopping-mate/prototype/</code> 동작 프로토타입과 데모 영상을 제작했다.
+  </div>
+</div>
+</body>
+</html>

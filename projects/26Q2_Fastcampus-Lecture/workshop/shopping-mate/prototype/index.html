@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Shopping Mate — Prototype</title>
+<style>
+  :root{
+    --action:#0066cc; --focus:#0071e3; --sky:#2997ff;
+    --ink:#1d1d1f; --ink80:#333; --ink48:#7a7a7a;
+    --canvas:#fff; --parchment:#f5f5f7; --pearl:#fafafc; --tile:#1d1d1f;
+    --hair:#e0e0e0; --divider:#f0f0f0; --rocket:#1769ff; --price:#e02020;
+    --font-d:"SF Pro Display",system-ui,-apple-system,Inter,sans-serif;
+    --font-t:"SF Pro Text",system-ui,-apple-system,Inter,sans-serif;
+    --r-sm:8px; --r-md:11px; --r-lg:18px; --r-pill:9999px;
+    --shadow-product:3px 5px 30px rgba(0,0,0,.22);
+  }
+  *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{font-family:var(--font-t);background:radial-gradient(1200px 800px at 50% -10%, #2a2a2e, #161618);
+    display:grid;place-items:center;color:var(--ink);}
+  .device{width:390px;height:844px;background:#000;border-radius:54px;padding:11px;position:relative;
+    box-shadow:0 40px 120px rgba(0,0,0,.6), inset 0 0 0 2px #2c2c2e;}
+  .viewport{width:100%;height:100%;background:var(--canvas);border-radius:44px;overflow:hidden;position:relative;}
+  .notch{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:128px;height:30px;background:#000;border-radius:18px;z-index:30;}
+  .status{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:flex-end;justify-content:space-between;
+    padding:0 30px 8px;font-size:14px;font-weight:600;z-index:20;color:var(--ink);pointer-events:none;}
+  .status.dark{color:#fff;}
+
+  .screen{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;visibility:hidden;
+    transform:translateX(24px);transition:opacity .42s ease, transform .42s cubic-bezier(.4,0,.2,1);background:var(--canvas);}
+  .screen.active{opacity:1;visibility:visible;transform:none;z-index:10;}
+  .screen.dark{background:var(--tile);color:#fff;}
+  .body{flex:1;overflow:hidden;padding:64px 22px 22px;display:flex;flex-direction:column;}
+  .step{font-size:13px;color:var(--ink48);}
+  h1.t{font-family:var(--font-d);font-weight:600;letter-spacing:-.6px;line-height:1.1;font-size:30px;margin:8px 0 18px;}
+  h1.t.sm{font-size:24px;}
+  .spacer{flex:1;}
+
+  .btn{display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font-t);font-size:17px;
+    border:none;cursor:pointer;transition:transform .12s ease, background .15s ease;width:100%;}
+  .btn:active{transform:scale(.96);}
+  .btn-primary{background:var(--action);color:#fff;border-radius:var(--r-pill);padding:16px;}
+  .btn-ghost{background:transparent;color:var(--action);border:1px solid var(--action);border-radius:var(--r-pill);padding:15px;}
+  .btn-icon{width:56px;flex:0 0 56px;border-radius:var(--r-pill);border:1px solid var(--hair);background:#fff;color:var(--ink);font-size:20px;}
+
+  /* splash */
+  .center{align-items:center;text-align:center;justify-content:center;gap:16px;}
+  .appicon{width:108px;height:108px;border-radius:28px;background:#fff;display:grid;place-items:center;box-shadow:var(--shadow-product);}
+  .appicon .bag{width:58px;height:54px;border:6px solid var(--action);border-radius:0 0 16px 16px;position:relative;}
+  .appicon .bag::before{content:"";position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:30px;height:30px;border:6px solid var(--action);border-bottom:none;border-radius:18px 18px 0 0;}
+
+  /* chat intent */
+  .bubble{max-width:78%;padding:12px 15px;border-radius:18px;font-size:15px;line-height:1.4;margin-bottom:10px;}
+  .bubble.ai{background:var(--parchment);color:var(--ink);border-bottom-left-radius:5px;align-self:flex-start;}
+  .bubble.me{background:var(--action);color:#fff;border-bottom-right-radius:5px;align-self:flex-end;}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+  .chip{border:1px solid var(--hair);border-radius:var(--r-pill);padding:10px 14px;font-size:14px;cursor:pointer;background:#fff;transition:border .15s,transform .12s;}
+  .chip:active{transform:scale(.97);}
+  .chip.sel{border:2px solid var(--focus);font-weight:600;background:#f7faff;}
+  .inputbar{display:flex;gap:8px;align-items:center;border:1px solid var(--hair);border-radius:var(--r-pill);padding:10px 14px;background:#fff;}
+  .inputbar .ph{color:var(--ink48);font-size:15px;flex:1;}
+
+  /* loading */
+  .spinner{width:56px;height:56px;border-radius:50%;border:5px solid rgba(255,255,255,.2);border-top-color:#fff;animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .tagpill{font-size:13px;color:var(--sky);border:1px solid rgba(41,151,255,.5);padding:6px 12px;border-radius:var(--r-pill);}
+
+  /* candidates */
+  .subnav{height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;
+    background:rgba(245,245,247,.82);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--divider);
+    font-family:var(--font-d);font-weight:600;font-size:18px;}
+  .subnav .re{font-family:var(--font-t);font-size:14px;color:var(--action);font-weight:400;cursor:pointer;}
+  .cards{padding:14px 18px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;flex:1;background:var(--parchment);}
+  .pcard{background:#fff;border:1px solid var(--hair);border-radius:var(--r-lg);padding:12px;cursor:pointer;transition:transform .12s ease;display:flex;gap:12px;}
+  .pcard:active{transform:scale(.99);}
+  .pcard .thumb{width:78px;height:78px;border-radius:var(--r-md);flex:0 0 78px;}
+  .t1{background:linear-gradient(135deg,#cfe0ff,#9bb8ff);} .t2{background:linear-gradient(135deg,#d6f5e0,#9be3b4);} .t3{background:linear-gradient(135deg,#ffe1c2,#ffc08a);}
+  .pcard .nm{font-size:15px;font-weight:600;letter-spacing:-.2px;}
+  .pcard .price{font-size:16px;font-weight:700;color:var(--ink);}
+  .pcard .price b{color:var(--price);}
+  .rocket{display:inline-flex;align-items:center;gap:3px;color:var(--rocket);font-weight:700;font-size:12px;}
+  .why{font-size:12px;color:var(--ink48);margin-top:3px;}
+  .badge-pick{display:inline-block;background:var(--action);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;margin-bottom:4px;}
+
+  /* compare */
+  .cmp{display:grid;grid-template-columns:1.2fr 1fr 1fr;font-size:12px;}
+  .cmp .h{font-weight:700;color:var(--ink48);padding:8px 6px;border-bottom:1px solid var(--hair);}
+  .cmp .c{padding:8px 6px;border-bottom:1px solid var(--divider);text-align:center;}
+  .cmp .c.win{color:var(--action);font-weight:700;background:#f2f8ff;}
+  .cmp .lab{text-align:left;color:var(--ink80);font-weight:600;}
+
+  /* detail */
+  .hero{height:200px;border-radius:var(--r-lg);margin-bottom:12px;}
+  .toast{position:absolute;left:24px;right:24px;bottom:30px;background:var(--ink);color:#fff;border-radius:var(--r-md);
+    padding:14px 18px;font-size:15px;display:flex;align-items:center;gap:10px;opacity:0;transform:translateY(12px);
+    transition:opacity .3s,transform .3s;z-index:25;}
+  .toast.show{opacity:1;transform:none;}
+
+  /* fake cursor */
+  #cursor{position:absolute;width:26px;height:26px;left:-60px;top:-60px;z-index:999;pointer-events:none;
+    transition:left .7s cubic-bezier(.5,0,.2,1), top .7s cubic-bezier(.5,0,.2,1);filter:drop-shadow(0 3px 5px rgba(0,0,0,.4));}
+  #cursor.click .ring{transform:scale(1);opacity:1;}
+  #cursor .ring{position:absolute;left:-8px;top:-8px;width:42px;height:42px;border-radius:50%;background:rgba(0,102,204,.3);
+    transform:scale(.2);opacity:0;transition:transform .35s ease, opacity .35s ease;}
+  .demo-badge{position:absolute;top:18px;left:18px;z-index:998;background:rgba(0,0,0,.6);color:#fff;font-size:11px;
+    padding:5px 10px;border-radius:var(--r-pill);font-family:var(--font-t);display:none;}
+  body.demo .demo-badge{display:block;}
+</style>
+</head>
+<body>
+<div class="device">
+  <div class="notch"></div>
+  <div class="viewport" id="viewport">
+    <div class="demo-badge">▶ AUTO DEMO</div>
+
+    <!-- 01 splash -->
+    <section class="screen active" data-screen="splash">
+      <div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="body center" style="background:var(--parchment);">
+        <div class="appicon"><div class="bag"></div></div>
+        <h1 class="t" style="margin-top:24px;">Shopping<br/>Mate</h1>
+        <div style="color:var(--ink48);font-size:16px;margin-top:-8px;">사고 싶은 걸 말하면, 딱 3개만 골라드려요</div>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" data-go="intent">시작하기</button>
+      </div>
+    </section>
+
+    <!-- 02 intent (chat) -->
+    <section class="screen" data-screen="intent">
+      <div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="body" style="padding-top:60px;">
+        <div class="step">의도를 알려주세요</div>
+        <div style="display:flex;flex-direction:column;margin-top:14px;">
+          <div class="bubble ai">무엇을 찾고 계세요? 예산·용도를 알려주시면 딱 맞는 3개를 골라드릴게요 🙂</div>
+          <div class="bubble me" id="intent-echo">5만원대 무선 이어폰, 운동용</div>
+        </div>
+        <div class="step" style="margin-top:8px;">빠른 조건</div>
+        <div class="chips">
+          <div class="chip sel" data-cond>운동용</div>
+          <div class="chip" data-cond>노이즈캔슬</div>
+          <div class="chip sel" data-cond>5만원대</div>
+          <div class="chip" data-cond>방수</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="inputbar"><span class="ph">메시지 입력…</span><span style="color:var(--action);font-size:20px;">↑</span></div>
+        <button class="btn btn-primary" data-go="loading" style="margin-top:10px;">이 조건으로 추천받기</button>
+      </div>
+    </section>
+
+    <!-- 03 loading -->
+    <section class="screen dark" data-screen="loading">
+      <div class="status dark"><span>9:41</span><span>5G ▮</span></div>
+      <div class="body center">
+        <div class="spinner"></div>
+        <h1 class="t sm" style="color:#fff;margin-top:20px;">상품을 비교하고<br/>있어요</h1>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+          <span class="tagpill">운동용</span><span class="tagpill">5만원대</span><span class="tagpill">리뷰 4.5+</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 candidates -->
+    <section class="screen" data-screen="cands">
+      <div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="subnav"><span>추천 3</span><span class="re" data-go="loading">다시 ↻</span></div>
+      <div class="cards">
+        <div class="pcard" data-go="compare">
+          <div class="thumb t1"></div>
+          <div>
+            <span class="badge-pick">AI 추천 1위</span>
+            <div class="nm">에어핏 프로 2 (운동용)</div>
+            <div class="price"><b>49,900원</b></div>
+            <div class="rocket">🚀 로켓배송 · ★4.7 (1,204)</div>
+            <div class="why">"운동용 방수 + 5만원 이하 중 리뷰 최상위"</div>
+          </div>
+        </div>
+        <div class="pcard" data-go="compare">
+          <div class="thumb t2"></div>
+          <div>
+            <div class="nm">사운드핏 액티브</div>
+            <div class="price"><b>43,000원</b></div>
+            <div class="rocket">🚀 로켓배송 · ★4.5 (860)</div>
+            <div class="why">"가성비 최고, 배터리 8시간"</div>
+          </div>
+        </div>
+        <div class="pcard" data-go="compare">
+          <div class="thumb t3"></div>
+          <div>
+            <div class="nm">비트버즈 스포츠</div>
+            <div class="price"><b>52,000원</b></div>
+            <div class="rocket">🚀 로켓배송 · ★4.6 (2,031)</div>
+            <div class="why">"노이즈캔슬 포함, 리뷰 수 최다"</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 compare -->
+    <section class="screen" data-screen="compare">
+      <div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="subnav"><span>비교</span><span class="re" data-go="cands">← 목록</span></div>
+      <div class="body" style="padding:64px 18px 18px;">
+        <div class="cmp">
+          <div class="h"></div><div class="h">에어핏 프로 2</div><div class="h">사운드핏</div>
+          <div class="c lab">가격</div><div class="c win">49,900</div><div class="c">43,000</div>
+          <div class="c lab">리뷰</div><div class="c win">★4.7</div><div class="c">★4.5</div>
+          <div class="c lab">방수</div><div class="c win">IPX5</div><div class="c">IPX4</div>
+          <div class="c lab">배터리</div><div class="c">6h</div><div class="c win">8h</div>
+          <div class="c lab">로켓배송</div><div class="c win">O</div><div class="c win">O</div>
+        </div>
+        <div style="background:var(--parchment);border-radius:var(--r-md);padding:12px;margin-top:14px;font-size:14px;color:var(--ink80);">
+          “운동·방수·리뷰를 우선하면 <b>에어핏 프로 2</b>가 가장 적합해요. 가격이 더 중요하면 사운드핏도 좋아요.”
+        </div>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" data-go="detail">에어핏 프로 2 선택</button>
+      </div>
+    </section>
+
+    <!-- 06 detail + cart -->
+    <section class="screen" data-screen="detail">
+      <div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="body" style="padding:60px 18px 18px;">
+        <div class="hero t1"></div>
+        <div class="nm" style="font-size:20px;font-weight:700;">에어핏 프로 2 (운동용)</div>
+        <div style="color:var(--ink48);font-size:14px;margin:4px 0;">★4.7 (1,204) · IPX5 방수 · 배터리 6h</div>
+        <div class="price" style="font-size:22px;font-weight:800;"><b style="color:var(--price);">49,900원</b></div>
+        <div class="rocket" style="margin-top:4px;">🚀 내일(수) 도착 보장 · 무료배송</div>
+        <div style="background:var(--parchment);border-radius:var(--r-md);padding:12px;margin-top:14px;font-size:14px;color:var(--ink80);">
+          “운동용 · 5만원 이하 · 리뷰 4.5+ 조건에 가장 잘 맞는 선택이에요.”
+        </div>
+        <div class="spacer"></div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-primary" data-accept style="flex:1;">장바구니 담기</button>
+          <button class="btn btn-icon" data-go="cands">↩</button>
+        </div>
+      </div>
+      <div class="toast" id="toast">✓ 장바구니에 담았어요 · 결정 근거 저장됨</div>
+    </section>
+
+  </div>
+</div>
+
+<svg id="cursor" viewBox="0 0 24 24"></svg>
+
+<script>
+const V = document.getElementById('viewport');
+function show(id){
+  V.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active', s.dataset.screen===id));
+  if(id==='loading'){ clearTimeout(show._t); show._t=setTimeout(()=>show('cands'), 1700); }
+}
+V.addEventListener('click',(e)=>{
+  const go=e.target.closest('[data-go]'); const cond=e.target.closest('[data-cond]'); const acc=e.target.closest('[data-accept]');
+  if(cond){ cond.classList.toggle('sel'); return; }
+  if(acc){ const t=document.getElementById('toast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); return; }
+  if(go){ show(go.dataset.go); }
+});
+
+/* AUTO DEMO */
+function demo(){
+  document.body.classList.add('demo');
+  const cursor=document.getElementById('cursor');
+  cursor.innerHTML='<polygon points="3,2 3,20 8,15 12,21 14,20 10,14 17,14" fill="#111" stroke="#fff" stroke-width="1.2"/><circle class="ring" cx="3" cy="2" r="0"/>';
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  async function moveTo(sel,nth=0){ const el=V.querySelectorAll(sel)[nth]; if(!el)return null; const r=el.getBoundingClientRect();
+    cursor.style.left=(r.left+r.width/2)+'px'; cursor.style.top=(r.top+r.height/2)+'px'; await sleep(760); return el; }
+  async function click(sel,nth=0){ const el=await moveTo(sel,nth); if(!el)return; cursor.classList.add('click'); await sleep(120);
+    el.dispatchEvent(new MouseEvent('click',{bubbles:true})); await sleep(260); cursor.classList.remove('click'); await sleep(360); }
+  (async()=>{
+    cursor.style.left='50%'; cursor.style.top='90%'; await sleep(900);
+    await click('[data-go="intent"]'); await sleep(500);
+    await click('[data-cond]',1);                 // toggle 노이즈캔슬
+    await sleep(300);
+    await click('[data-go="loading"]'); await sleep(2600);  // → cands
+    await moveTo('.pcard',0); await sleep(300);
+    await click('.pcard',0);                        // → compare
+    await sleep(700);
+    await click('[data-go="detail"]'); await sleep(700);
+    await click('[data-accept]'); await sleep(2400);
+    document.querySelector('.demo-badge').textContent='✓ DEMO END'; await sleep(800);
+    window.__DEMO_DONE__=true;
+  })();
+}
+if(new URLSearchParams(location.search).get('demo')==='1'){ window.addEventListener('load',()=>setTimeout(demo,400)); }
+</script>
+</body>
+</html>

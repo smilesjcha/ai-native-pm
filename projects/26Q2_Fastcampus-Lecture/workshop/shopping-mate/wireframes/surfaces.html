@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>Shopping Mate — 지면별 Agent 적용 시안 (Home/SRP/PLP/PDP)</title>
+<style>
+  :root{
+    --action:#0066cc; --focus:#0071e3; --sky:#2997ff; --rocket:#1769ff; --price:#e02020; --good:#1f883d;
+    --ink:#1d1d1f; --ink48:#7a7a7a; --canvas:#fff; --parch:#f5f5f7; --tile:#1d1d1f; --hair:#e0e0e0; --divider:#f0f0f0;
+    --font-d:"SF Pro Display",system-ui,-apple-system,Inter,sans-serif; --font-t:"SF Pro Text",system-ui,-apple-system,Inter,sans-serif;
+    --fg-bg:#1a1a1c; --fg-line:#3a3a3e; --fg-text:#e6e6ea; --fg-mut:#8a8a92;
+  }
+  *{box-sizing:border-box;margin:0;}
+  body{background:var(--fg-bg);background-image:radial-gradient(circle, rgba(255,255,255,.05) 1px, transparent 1px);background-size:22px 22px;
+    font-family:var(--font-t);color:var(--fg-text);padding:34px 30px 60px;}
+  h1{font-family:var(--font-d);font-size:19px;font-weight:600;letter-spacing:-.4px;}
+  .sub{color:var(--fg-mut);font-size:12px;margin:4px 0 26px;}
+  .grid{display:flex;gap:26px;flex-wrap:wrap;}
+  .col{width:268px;}
+  .cap{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+  .cap .tag{font-size:11px;font-weight:700;color:#0a0a0a;background:var(--sky);padding:3px 8px;border-radius:6px;}
+  .cap .nm{font-size:13px;font-weight:600;}
+  .phone{width:268px;height:540px;background:var(--canvas);border-radius:30px;overflow:hidden;position:relative;border:1px solid var(--fg-line);box-shadow:0 16px 44px rgba(0,0,0,.5);}
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:104px;height:20px;background:#000;border-radius:0 0 13px 13px;z-index:5;}
+  .status{height:34px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 16px 3px;font-size:10px;color:var(--ink);font-weight:600;}
+  .scr{height:calc(100% - 34px);overflow:hidden;color:var(--ink);position:relative;}
+  .topbar{height:42px;display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--divider);}
+  .search{flex:1;height:30px;border:1px solid var(--hair);border-radius:9999px;display:flex;align-items:center;padding:0 12px;font-size:11px;color:var(--ink48);}
+  .pad{padding:12px;}
+  /* agent touchpoint highlight */
+  .agent{position:relative;border:2px solid var(--action);border-radius:14px;background:#f2f8ff;padding:10px;}
+  .agent::before{content:"AI Agent";position:absolute;top:-9px;left:10px;background:var(--action);color:#fff;font-size:9px;font-weight:700;padding:1px 7px;border-radius:6px;}
+  .agent .q{font-size:12px;font-weight:600;color:var(--ink);}
+  .agent .a{font-size:11px;color:var(--action);margin-top:3px;}
+  .row{display:flex;gap:8px;}
+  .thumb{border-radius:9px;flex:0 0 auto;}
+  .t1{background:linear-gradient(135deg,#cfe0ff,#9bb8ff);} .t2{background:linear-gradient(135deg,#d6f5e0,#9be3b4);} .t3{background:linear-gradient(135deg,#ffe1c2,#ffc08a);} .t4{background:linear-gradient(135deg,#e7d6ff,#c4a9ff);}
+  .pname{font-size:11px;font-weight:600;} .price{font-size:11px;font-weight:700;} .price b{color:var(--price);}
+  .rocket{color:var(--rocket);font-weight:700;font-size:9px;}
+  .chiprow{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;}
+  .chip{border:1px solid var(--hair);border-radius:9999px;padding:5px 9px;font-size:10px;}
+  .chip.on{border:2px solid var(--focus);font-weight:600;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .card{border:1px solid var(--hair);border-radius:12px;padding:7px;}
+  .sectiontitle{font-size:12px;font-weight:700;margin:10px 0 6px;}
+  .annot{margin-top:8px;font-size:10px;color:var(--fg-mut);line-height:1.5;}
+  .annot b{color:#cfe3ff;}
+</style></head>
+<body>
+<h1>지면별 Agent 적용 시안 — Home · SRP · PLP · PDP</h1>
+<div class="sub">코드 기반(디자인 시스템 토큰) 시안 — 각 지면의 파란 박스가 Agent 적용 지점</div>
+<div class="grid">
+
+  <!-- HOME -->
+  <div class="col">
+    <div class="cap"><span class="tag">HOME</span><span class="nm">홈 — 선제적 제안</span></div>
+    <div class="phone"><div class="notch"></div><div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="scr">
+        <div class="topbar"><b style="font-size:13px;color:var(--action);">Shopping Mate</b><div class="search">검색</div></div>
+        <div class="pad">
+          <div class="agent"><div class="q">🤖 "어제 본 러닝화, 가격 5%↓ 됐어요"</div><div class="a">지금 보기 · 비슷한 대안 3개 →</div></div>
+          <div class="sectiontitle">오늘의 추천</div>
+          <div class="grid2">
+            <div class="card"><div class="thumb t1" style="height:60px"></div><div class="pname">에어핏 프로 2</div><div class="price"><b>49,900</b></div><div class="rocket">🚀 내일도착</div></div>
+            <div class="card"><div class="thumb t2" style="height:60px"></div><div class="pname">사운드핏</div><div class="price"><b>43,000</b></div><div class="rocket">🚀 내일도착</div></div>
+            <div class="card"><div class="thumb t3" style="height:60px"></div><div class="pname">비트버즈</div><div class="price"><b>52,000</b></div><div class="rocket">🚀 내일도착</div></div>
+            <div class="card"><div class="thumb t4" style="height:60px"></div><div class="pname">스포츠밴드</div><div class="price"><b>19,900</b></div><div class="rocket">🚀 내일도착</div></div>
+          </div>
+        </div>
+      </div></div>
+    <div class="annot"><b>Agent 가능성</b> — 맥락(지난 탐색·가격변동) 기반 선제 제안, "오늘 뭐 살까" 진입. <b>메트릭</b> 홈→탐색 전환·재방문.</div>
+  </div>
+
+  <!-- SRP -->
+  <div class="col">
+    <div class="cap"><span class="tag">SRP</span><span class="nm">검색 결과 — 의도 이해</span></div>
+    <div class="phone"><div class="notch"></div><div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="scr">
+        <div class="topbar"><span style="font-size:12px;">←</span><div class="search" style="color:var(--ink)">운동용 무선 이어폰</div></div>
+        <div class="pad">
+          <div class="agent"><div class="q">🤖 "운동용"으로 이해했어요 — 방수·고정력 우선?</div><div class="a">조건 추가: 노이즈캔슬 · 5만원 이하 →</div></div>
+          <div class="chiprow"><span class="chip on">방수 IPX5+</span><span class="chip on">5만원↓</span><span class="chip">노이즈캔슬</span></div>
+          <div class="sectiontitle">결과 248개 · AI 정렬</div>
+          <div class="card row" style="margin-bottom:7px;"><div class="thumb t1" style="width:46px;height:46px"></div><div><div class="pname">에어핏 프로 2 <span style="color:var(--action);font-size:9px;">왜 1위?</span></div><div class="price"><b>49,900</b></div><div class="rocket">🚀 ★4.7</div></div></div>
+          <div class="card row" style="margin-bottom:7px;"><div class="thumb t2" style="width:46px;height:46px"></div><div><div class="pname">사운드핏 액티브</div><div class="price"><b>43,000</b></div><div class="rocket">🚀 ★4.5</div></div></div>
+          <div class="card row"><div class="thumb t3" style="width:46px;height:46px"></div><div><div class="pname">비트버즈 스포츠</div><div class="price"><b>52,000</b></div><div class="rocket">🚀 ★4.6</div></div></div>
+        </div>
+      </div></div>
+    <div class="annot"><b>Agent 가능성</b> — 모호 질의 의도 보정, 조건 제안, "왜 이 순위인지" 근거. <b>메트릭</b> 검색→클릭(CTR)·0건 검색률.</div>
+  </div>
+
+  <!-- PLP -->
+  <div class="col">
+    <div class="cap"><span class="tag">PLP</span><span class="nm">목록 — 후보 압축·비교</span></div>
+    <div class="phone"><div class="notch"></div><div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="scr">
+        <div class="topbar"><span style="font-size:12px;">←</span><b style="font-size:12px;">무선 이어폰</b><div class="search" style="flex:0 0 60px;justify-content:center;">필터</div></div>
+        <div class="pad">
+          <div class="agent"><div class="q">🤖 "248개 중 조건 맞는 3개만 추렸어요"</div><div class="a">3개 비교하기 →</div></div>
+          <div class="card row" style="margin:7px 0;"><div class="thumb t1" style="width:50px;height:50px"></div><div><div style="font-size:9px;font-weight:700;background:var(--action);color:#fff;display:inline-block;padding:1px 5px;border-radius:5px;">AI 1위</div><div class="pname">에어핏 프로 2</div><div class="price"><b>49,900</b> <span class="rocket">🚀 ★4.7</span></div></div></div>
+          <div class="card row" style="margin-bottom:7px;"><div class="thumb t2" style="width:50px;height:50px"></div><div><div class="pname">사운드핏 액티브</div><div class="price"><b>43,000</b> <span class="rocket">🚀 ★4.5</span></div></div></div>
+          <div class="card row"><div class="thumb t3" style="width:50px;height:50px"></div><div><div class="pname">비트버즈 스포츠</div><div class="price"><b>52,000</b> <span class="rocket">🚀 ★4.6</span></div></div></div>
+          <div style="background:var(--action);color:#fff;text-align:center;border-radius:9999px;padding:9px;font-size:12px;font-weight:600;margin-top:10px;">3개 나란히 비교</div>
+        </div>
+      </div></div>
+    <div class="annot"><b>Agent 가능성</b> — 후보 N→3 압축, 나란히 비교, 차이 하이라이트. <b>메트릭</b> 목록→상세·비교 사용률.</div>
+  </div>
+
+  <!-- PDP -->
+  <div class="col">
+    <div class="cap"><span class="tag">PDP</span><span class="nm">상세 — 결정 근거·리뷰요약</span></div>
+    <div class="phone"><div class="notch"></div><div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="scr">
+        <div class="topbar"><span style="font-size:12px;">←</span><b style="font-size:12px;">에어핏 프로 2</b><span style="font-size:12px;">♡</span></div>
+        <div class="pad">
+          <div class="thumb t1" style="height:96px;border-radius:12px;"></div>
+          <div class="pname" style="font-size:14px;margin-top:7px;">에어핏 프로 2 (운동용)</div>
+          <div class="price" style="font-size:15px;"><b>49,900원</b></div>
+          <div class="rocket" style="font-size:10px;">🚀 내일(수) 도착 · 무료배송</div>
+          <div class="agent" style="margin-top:9px;"><div class="q">🤖 리뷰 1,204개 요약</div><div class="a" style="color:var(--ink);font-size:10px;line-height:1.45;">"운동 중 흘러내림 적음·방수 만족" 89% · 단점 "케이스 큼" 11%</div></div>
+          <div class="agent" style="margin-top:8px;"><div class="q">🤖 당신 조건에 맞는 이유</div><div class="a">운동·5만원↓·리뷰4.5+ 모두 충족 ✓</div></div>
+        </div>
+      </div></div>
+    <div class="annot"><b>Agent 가능성</b> — 리뷰 요약, 조건 적합 이유, Q&A, 대안 제시. <b>메트릭</b> 상세→장바구니 CVR·체류·이탈.</div>
+  </div>
+
+</div>
+</body>
+</html>

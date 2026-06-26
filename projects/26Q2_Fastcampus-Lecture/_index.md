@@ -14,11 +14,30 @@
 
 2026-06-26 강의분에 **Apple 디자인 시스템 → 토큰 → 와이어프레임 → 프로토타입 → 데모영상** 워크플로우를 추가하고(v03), 이어서 **덱 전체를 Apple 디자인 그래머 + 나눔고딕으로 프리미엄 리디자인**했다(v04). 표지에 강의 일시 **2026.06.26 (금) 17:00–19:00**를 표기.
 
+### v05 — 실무 AI 적용 사례 (커머스 Shopping Mate)
+
+대상이 **10주 과정 수료 직전 실참여 수강생**으로 바뀐 후속 특강용으로, 제목을 **"실무 AI 적용 사례"**로, 데모를 **Lunch Mate → Shopping Mate(독립 신규 Shopping Agent 앱)**로 재설계했다. 흐름: 커머스 지표 언어 → Agent 벤치마크(Alexa·Clova) 비교 → mock 데이터 코호트·퍼널 분석 → PRD·와이어프레임·프로토타입·데모영상. (v04는 예비 수강생용으로 그대로 보존)
+
+| 문서 | 경로 |
+|------|------|
+| **강의 프레임 v2** | [`planning/lecture-frame-v2(실무-AI-적용-사례).md`](planning/lecture-frame-v2(실무-AI-적용-사례).md) — 모듈 흐름·산출물·준비물 체크리스트 |
+| **강의 설계 방향성** | [`planning/teaching-design-direction.md`](planning/teaching-design-direction.md) — 마지막 수업 큐레이션(하나를 깊게)·Core/Optional·시간 배분·‘안 다룸’ 명시 |
+| **Shopping Mate PRD** | `prd/PRD-shopping-mate.md` (두괄식·지면별 Agent 매트릭스·코드 시안/영상 임베드 적용) |
+| **PRD 작성 플레이북** | [`docs/guides/prd-authoring-playbook.md`](../../docs/guides/prd-authoring-playbook.md) — 두괄식·중복제거·표양식·Confluence storage format·지면별 매트릭스·코드 시안/영상·집중역할 |
+| **이해관계자 정렬 플레이북** | [`docs/guides/stakeholder-alignment-playbook.md`](../../docs/guides/stakeholder-alignment-playbook.md) — 디자이너·개발자·리더십 정렬 카드·산출물×청중 매트릭스·합의 게이트 (3관점 평가 연계) |
+| **지면별 시안 (코드)** | `workshop/shopping-mate/wireframes/surfaces.html` (Home/SRP/PLP/PDP Agent 적용) · `prd/assets/` 로컬 이미지 |
+| **와이어프레임** | `workshop/shopping-mate/wireframes/index.html` (6화면×4단계 User Flow) |
+| **프로토타입 + 데모영상** | `workshop/shopping-mate/prototype/` (`index.html`, `demo-shopping-mate.mp4`) |
+| **실습 가이드 v05** | [`workshop/workshop-guide-v05(실무-AI-적용-사례).md`](workshop/workshop-guide-v05(실무-AI-적용-사례).md) — Claude Code Step 0~7(디자인 토큰 부트스트랩 포함) + Core/Optional + 준비 상태 |
+| **mock 데이터셋 + 분석** | `analysis/data/mock-events.csv` (28k행) · `analysis/analyze-shopping-mate.py` (검증됨, 코호트/퍼널) |
+| **분석 차트(덱용)** | `analysis/charts.html` → `analysis/outputs/sm-cohort-funnel.png` |
+| **PPT/PDF (v05)** | `assets/pptx/fastcampus-commerce-ai-v05-20260626.pptx` / `.pdf` (36장 — 디자인 토큰 부트스트랩·핵심 큐레이션·PRD노하우·지면 매트릭스·정렬 포함) |
+
 ## 문서 맵
 
 | 문서 | 경로 | 설명 |
 |------|------|------|
-| PRD (데모 예시) | `prd/PRD.md` | "오늘의 점심 메이트" 서비스 PRD |
+| PRD (데모 예시) | `prd/PRD.md` | "오늘의 점심 메이트" 서비스 PRD (v04 강의용) |
 | 강의 스크립트 | `workshop/lecture-script.md` | 30분 강의 노트 |
 | 실습 가이드 | `workshop/workshop-guide.md` | 60분 실습 Step-by-Step |
 | 데모 프로토타입 (구) | `workshop/demo-prototype.html` | 단일 HTML 프로토타입 |

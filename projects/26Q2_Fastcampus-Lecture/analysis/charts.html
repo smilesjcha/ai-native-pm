@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="utf-8" />
+<title>Shopping Mate — Mock 데이터 분석 (코호트 · 퍼널)</title>
+<style>
+  :root{--action:#0066cc;--sky:#2997ff;--ink:#1d1d1f;--mut:#86868b;--hair:#e8e8ed;--parch:#f5f5f7;--price:#e02020;--good:#1f883d;}
+  *{box-sizing:border-box;margin:0;}
+  body{font-family:"NanumGothic","Apple SD Gothic Neo",system-ui,sans-serif;color:var(--ink);background:#fff;padding:28px 32px;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+  .panel{border:1px solid var(--hair);border-radius:16px;padding:20px;}
+  h2{font-size:17px;font-weight:800;letter-spacing:-.3px;margin-bottom:3px;}
+  .sub{font-size:11px;color:var(--mut);margin-bottom:16px;}
+  /* cohort */
+  table{border-collapse:collapse;width:100%;font-size:11px;}
+  th{font-size:10px;color:var(--mut);font-weight:600;padding:4px;text-align:center;}
+  td{text-align:center;padding:0;}
+  .cell{height:30px;border-radius:5px;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;margin:2px;}
+  .wk{font-size:10px;color:var(--ink);font-weight:700;text-align:left;padding-left:2px;}
+  /* funnel */
+  .frow{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+  .flabel{width:120px;font-size:12px;font-weight:600;}
+  .fbar{height:30px;border-radius:6px;background:var(--action);display:flex;align-items:center;padding:0 10px;color:#fff;font-size:11px;font-weight:700;}
+  .fdrop{font-size:11px;color:var(--price);font-weight:700;width:64px;text-align:right;}
+  .note{margin-top:14px;font-size:11px;color:var(--mut);line-height:1.5;}
+  .kpi{display:flex;gap:18px;margin-top:6px;}
+  .kpi div b{font-size:20px;color:var(--action);} .kpi div span{font-size:10px;color:var(--mut);display:block;}
+</style></head>
+<body>
+<div class="grid">
+  <div class="panel">
+    <h2>주차별 재구매 코호트 (리텐션)</h2>
+    <div class="sub">mock · 가입 주차별 N주 후 재구매율 (%) — Shopping Mate 사용 코호트</div>
+    <table>
+      <tr><th>가입 코호트</th><th>W0</th><th>W1</th><th>W2</th><th>W3</th><th>W4</th></tr>
+      <tr><td class="wk">6/01 (1,000명)</td>
+        <td><div class="cell" style="background:#0a3d82">100</div></td>
+        <td><div class="cell" style="background:#0f5fb0">42</div></td>
+        <td><div class="cell" style="background:#2f86d8">31</div></td>
+        <td><div class="cell" style="background:#79b4e8">25</div></td>
+        <td><div class="cell" style="background:#a9d0f2">22</div></td></tr>
+      <tr><td class="wk">6/08 (1,250명)</td>
+        <td><div class="cell" style="background:#0a3d82">100</div></td>
+        <td><div class="cell" style="background:#1463b4">45</div></td>
+        <td><div class="cell" style="background:#2f86d8">33</div></td>
+        <td><div class="cell" style="background:#79b4e8">27</div></td>
+        <td><div class="cell" style="background:#bcdaf5">—</div></td></tr>
+      <tr><td class="wk">6/15 (1,480명)</td>
+        <td><div class="cell" style="background:#0a3d82">100</div></td>
+        <td><div class="cell" style="background:#1463b4">48</div></td>
+        <td><div class="cell" style="background:#3f90dd">36</div></td>
+        <td><div class="cell" style="background:#cfe3f7">—</div></td>
+        <td><div class="cell" style="background:#eef4fb">—</div></td></tr>
+      <tr><td class="wk">6/22 (1,610명)</td>
+        <td><div class="cell" style="background:#0a3d82">100</div></td>
+        <td><div class="cell" style="background:#1a6fbf">51</div></td>
+        <td><div class="cell" style="background:#dcdcdc;color:#aaa">—</div></td>
+        <td><div class="cell" style="background:#eef4fb">—</div></td>
+        <td><div class="cell" style="background:#f6f9fd">—</div></td></tr>
+    </table>
+    <div class="note">📈 인사이트: W1 재구매율이 42% → <b style="color:var(--good)">51%</b>로 코호트마다 개선 (결정 근거 저장 → 재방문 효과 가설). W4 정착률 22%가 목표(25%)에 근접.</div>
+  </div>
+
+  <div class="panel">
+    <h2>구매 퍼널 (이탈 구간)</h2>
+    <div class="sub">mock · Agent open → checkout 단계별 잔존율</div>
+    <div class="frow"><div class="flabel">Agent 진입</div><div class="fbar" style="width:100%;">100%</div><div class="fdrop"></div></div>
+    <div class="frow"><div class="flabel">의도 입력</div><div class="fbar" style="width:86%;">86%</div><div class="fdrop">−14%</div></div>
+    <div class="frow"><div class="flabel">후보 조회</div><div class="fbar" style="width:78%;">78%</div><div class="fdrop">−8%</div></div>
+    <div class="frow"><div class="flabel">비교/상세</div><div class="fbar" style="width:61%;">61%</div><div class="fdrop">−17%</div></div>
+    <div class="frow"><div class="flabel">장바구니</div><div class="fbar" style="width:48%;background:var(--good);">48%</div><div class="fdrop">−13%</div></div>
+    <div class="frow"><div class="flabel">결제</div><div class="fbar" style="width:31%;background:#0a3d82;">31%</div><div class="fdrop">−17%</div></div>
+    <div class="note">🔎 인사이트: <b style="color:var(--price)">비교/상세 → 장바구니(−17%)</b>가 최대 이탈 구간. 결정 근거 카드를 상세 상단에 고정하는 개선 가설 → A/B 대상.</div>
+    <div class="kpi">
+      <div><b>22%→30%</b><span>상세→장바구니 CVR(목표)</span></div>
+      <div><b>6.5→2분</b><span>결정 시간(목표)</span></div>
+      <div><b>3회+</b><span>주간 재사용(목표)</span></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
