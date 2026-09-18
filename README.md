@@ -5,6 +5,22 @@ Claude를 활용해 PRD 작성·평가·설계 문서·프로토타입까지 전
 
 ---
 
+## 오늘의 강의 — 2026-09-19(토) · 생성형 AI를 활용한 기획자 업무생산성 향상
+
+> 2026 핀테크 인력양성사업 · 기획자 과정 모듈5 (한국핀테크지원센터 · KMAC) · 09:30–16:30 · KMAC 비즈니스 스쿨 M1 교육장
+
+| 수강생 바로가기 | 링크 |
+|----------------|------|
+| 강의 안내·시간표(Session 1·2·3)·준비물 | [`projects/26Q3_AI-Native-PM/README.md`](projects/26Q3_AI-Native-PM/README.md) |
+| 강의안 PDF (배포용) | [`kmac-m5-ai-pm-productivity-20260919-dist.pdf`](projects/26Q3_AI-Native-PM/assets/pptx/kmac-m5-ai-pm-productivity-20260919-dist.pdf) |
+| 실습 키트(가이드·프롬프트·가상 데이터) | [`projects/26Q3_AI-Native-PM/workshop/`](projects/26Q3_AI-Native-PM/workshop/README.md) |
+| 미니 프로젝트 제출 안내 | [`mini-project-submission.md`](projects/26Q3_AI-Native-PM/workshop/mini-project-submission.md) |
+| 화면 예시·시안·데모 영상 | [`assets/GALLERY.md`](projects/26Q3_AI-Native-PM/assets/GALLERY.md) |
+
+이 레포 자체가 강의 Session 3에서 다루는 **하네스 문서 구조**(규칙 파일 `CLAUDE.md` + `context/` + `docs/templates` + `projects/`)의 실제 예시다.
+
+---
+
 ## 대상
 
 AI를 업무에 적극 활용하는 PM 조직 (Product Manager, Designer, Engineering Manager, QA)

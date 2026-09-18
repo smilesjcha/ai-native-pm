@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>머니핏(MoneyFit) — 지면별 AI 적용 시안 보드 (교육용 가상 사례)</title>
+<style>
+  /* ── 디자인 토큰 (docs/design-system/tokens/tokens.css 의 필수 토큰을 인라인 — 단일 파일 원칙) ── */
+  :root{
+    --color-action-blue:#0066cc; --color-focus-blue:#0071e3; --color-sky-link-blue:#2997ff;
+    --color-ink:#1d1d1f; --color-ink-muted-80:#333333; --color-ink-muted-48:#7a7a7a;
+    --color-canvas:#ffffff; --color-parchment:#f5f5f7; --color-pearl:#fafafc; --color-tile-1:#272729;
+    --color-divider-soft:#f0f0f0; --color-hairline:#e0e0e0;
+    --color-on-primary:#ffffff;
+    --font-text:"Apple SD Gothic Neo","NanumGothic","Nanum Gothic","Malgun Gothic",system-ui,-apple-system,sans-serif;
+    --font-display:var(--font-text);
+    --weight-regular:400; --weight-semibold:600; --weight-bold:700;
+    --radius-xs:5px; --radius-sm:8px; --radius-md:11px; --radius-lg:18px; --radius-pill:9999px;
+    --space-xxs:4px; --space-xs:8px; --space-sm:12px; --space-md:17px; --space-lg:24px; --space-xl:32px;
+    --shadow-product:3px 5px 30px 0 rgba(0,0,0,.22);
+    /* 보드(배경) 전용 */
+    --board-bg:#1a1a1c; --board-line:#3a3a3e; --board-text:#e6e6ea; --board-muted:#8a8a92;
+    --ai-tint:#eef5ff;
+  }
+  *{box-sizing:border-box;margin:0;}
+  body{background:var(--board-bg);background-image:radial-gradient(circle, rgba(255,255,255,.05) 1px, transparent 1px);background-size:22px 22px;
+    font-family:var(--font-text);color:var(--board-text);padding:36px 34px 56px;-webkit-font-smoothing:antialiased;}
+
+  /* 보드 헤더 */
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:var(--weight-bold);letter-spacing:.2px;
+    color:#fff;background:var(--color-action-blue);padding:6px 12px;border-radius:var(--radius-pill);margin-bottom:12px;}
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:#fff;opacity:.85;}
+  h1{font-family:var(--font-display);font-size:22px;font-weight:var(--weight-semibold);letter-spacing:-.4px;line-height:1.25;}
+  .sub{color:var(--board-muted);font-size:12.5px;margin:6px 0 26px;line-height:1.6;}
+  .sub b{color:#cfe3ff;font-weight:var(--weight-semibold);}
+
+  /* 그리드 */
+  .grid{display:flex;gap:28px;flex-wrap:nowrap;align-items:flex-start;}
+  .col{width:300px;flex:0 0 300px;}
+  .cap{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+  .cap .tag{font-size:11px;font-weight:var(--weight-bold);color:#0a0a0a;background:var(--color-sky-link-blue);padding:3px 8px;border-radius:6px;letter-spacing:.2px;}
+  .cap .nm{font-size:13px;font-weight:var(--weight-semibold);}
+
+  /* 폰 프레임 */
+  .phone{width:300px;height:600px;background:var(--color-canvas);border-radius:32px;overflow:hidden;position:relative;border:1px solid var(--board-line);box-shadow:0 16px 44px rgba(0,0,0,.5);color:var(--color-ink);}
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:110px;height:22px;background:#000;border-radius:0 0 14px 14px;z-index:5;}
+  .status{height:36px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 18px 4px;font-size:10.5px;font-weight:var(--weight-semibold);}
+  .scr{height:calc(100% - 36px);overflow:hidden;position:relative;display:flex;flex-direction:column;}
+  .topbar{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--color-divider-soft);flex:0 0 44px;}
+  .brand{font-size:14px;font-weight:var(--weight-bold);color:var(--color-action-blue);letter-spacing:-.2px;}
+  .tb-title{font-size:13px;font-weight:var(--weight-semibold);}
+  .tb-side{font-size:11px;color:var(--color-ink-muted-48);}
+  .pad{padding:12px 14px 22px;flex:1;display:flex;flex-direction:column;gap:10px;}
+  h2.t{font-size:17px;font-weight:var(--weight-semibold);letter-spacing:-.3px;line-height:1.3;}
+  .lead{font-size:11.5px;color:var(--color-ink-muted-48);line-height:1.5;}
+  .spacer{flex:1;}
+
+  /* AI 적용 지점 강조 — Action Blue 박스 + 라벨 */
+  .ai{position:relative;border:2px solid var(--color-action-blue);border-radius:14px;background:var(--ai-tint);padding:11px 11px 10px;}
+  .ai::before{content:"AI 적용";position:absolute;top:-9px;left:10px;background:var(--color-action-blue);color:#fff;font-size:9.5px;font-weight:var(--weight-bold);padding:1px 8px;border-radius:6px;letter-spacing:.2px;}
+  .ai .q{font-size:12px;font-weight:var(--weight-semibold);color:var(--color-ink);line-height:1.4;}
+  .ai .a{font-size:10.5px;color:var(--color-action-blue);margin-top:4px;line-height:1.45;}
+  .ai .note{font-size:9.5px;color:var(--color-ink-muted-48);margin-top:4px;line-height:1.4;}
+
+  /* 공용 컴포넌트 */
+  .btn{display:flex;align-items:center;justify-content:center;border-radius:var(--radius-pill);font-size:12.5px;font-weight:var(--weight-semibold);padding:11px 14px;}
+  .btn-primary{background:var(--color-action-blue);color:var(--color-on-primary);}
+  .btn-ghost{background:transparent;color:var(--color-action-blue);border:1px solid var(--color-action-blue);}
+  .card{border:1px solid var(--color-hairline);border-radius:var(--radius-md);padding:10px 11px;background:var(--color-canvas);}
+  .row{display:flex;align-items:center;gap:8px;}
+  .chk{width:16px;height:16px;border-radius:5px;border:1.5px solid var(--color-hairline);flex:0 0 16px;display:grid;place-items:center;font-size:10px;color:#fff;}
+  .chk.on{background:var(--color-action-blue);border-color:var(--color-action-blue);}
+  .item-nm{font-size:12px;font-weight:var(--weight-semibold);}
+  .item-sub{font-size:10px;color:var(--color-ink-muted-48);}
+  .fine{font-size:9.5px;color:var(--color-ink-muted-48);line-height:1.45;}
+  .chip{border:1px solid var(--color-hairline);border-radius:var(--radius-pill);padding:6px 10px;font-size:11px;background:#fff;}
+  .chip.on{border:2px solid var(--color-focus-blue);font-weight:var(--weight-semibold);background:#f7faff;}
+  .chiprow{display:flex;gap:6px;flex-wrap:wrap;}
+  .kpi{font-size:24px;font-weight:var(--weight-bold);letter-spacing:-.6px;line-height:1.1;}
+  .kpi small{font-size:11px;font-weight:var(--weight-regular);color:var(--color-ink-muted-48);margin-left:4px;letter-spacing:0;}
+  .bars{display:flex;flex-direction:column;gap:6px;}
+  .bar{display:grid;grid-template-columns:34px 1fr 30px;align-items:center;gap:8px;font-size:10.5px;}
+  .bar .lab{color:var(--color-ink-muted-80);}
+  .bar .track{height:8px;background:var(--color-parchment);border-radius:4px;overflow:hidden;}
+  .bar .fill{display:block;height:100%;background:var(--color-ink-muted-48);border-radius:4px;}
+  .bar .fill.hi{background:var(--color-action-blue);}
+  .bar .val{text-align:right;color:var(--color-ink-muted-48);}
+  .prog{height:8px;background:#dfe9f7;border-radius:4px;overflow:hidden;margin-top:6px;}
+  .prog i{display:block;height:100%;width:10%;background:var(--color-action-blue);border-radius:4px;}
+  .tabbar{height:50px;border-top:1px solid var(--color-divider-soft);display:flex;align-items:center;justify-content:space-around;font-size:9.5px;color:var(--color-ink-muted-48);flex:0 0 50px;}
+  .tabbar .on{color:var(--color-action-blue);font-weight:var(--weight-bold);}
+  .steps{display:flex;gap:4px;}
+  .steps i{width:18px;height:4px;border-radius:2px;background:var(--color-hairline);display:block;}
+  .steps i.on{background:var(--color-action-blue);}
+  .stamp{position:absolute;left:0;right:0;bottom:0;text-align:center;font-size:8.5px;color:var(--color-ink-muted-48);padding:3px 0 5px;background:rgba(255,255,255,.9);}
+
+  /* 캡션 */
+  .annot{margin-top:12px;font-size:11px;color:var(--board-muted);line-height:1.55;display:grid;grid-template-columns:64px 1fr;row-gap:3px;column-gap:8px;}
+  .annot dt{color:#cfe3ff;font-weight:var(--weight-semibold);}
+  .annot dd{margin:0;}
+  .annot code{font-family:"SF Mono",ui-monospace,Menlo,monospace;font-size:10.5px;color:#fff;background:rgba(255,255,255,.08);padding:1px 6px;border-radius:4px;}
+
+  .foot{margin-top:30px;padding-top:14px;border-top:1px solid var(--board-line);font-size:11px;color:var(--board-muted);line-height:1.7;display:flex;gap:28px;flex-wrap:wrap;}
+  .foot .lg{display:inline-flex;align-items:center;gap:6px;}
+  .foot .sw{width:14px;height:10px;border:2px solid var(--color-action-blue);border-radius:3px;background:var(--ai-tint);display:inline-block;}
+</style>
+</head>
+<body>
+
+<div class="eyebrow"><span class="dot"></span>교육용 가상 사례 · 머니핏(MoneyFit) by 핀트리(FinTree)</div>
+<h1>머니핏 지면별 AI 적용 시안 — 온보딩 · 홈 대시보드 · 목표 설정 · AI 코칭</h1>
+<div class="sub">코드 기반 시안(디자인 토큰을 파일 안에 인라인) · <b>파란 박스 = AI 적용 지점</b> · 모든 수치는 <b>[가정]</b> · 실제 금융기관·상품·고객 정보 없음 · 인증·동의 문구는 컴플라이언스 확인 필요</div>
+
+<div class="grid">
+
+  <!-- 01 온보딩 · 계좌 연동 -->
+  <div class="col">
+    <div class="cap"><span class="tag">01 ONBOARDING</span><span class="nm">온보딩 · 계좌 연동</span></div>
+    <div class="phone"><div class="notch"></div><div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="scr">
+        <div class="topbar"><span class="brand">머니핏</span><div class="steps"><i class="on"></i><i></i><i></i></div></div>
+        <div class="pad">
+          <h2 class="t">내 돈이 어디로 가는지,<br/>3분이면 보여요</h2>
+          <div class="lead">계좌·카드를 연동하면 소비를 자동으로 분류하고 월간 요약을 만들어 드려요.</div>
+          <div class="ai">
+            <div class="q">🤖 어디부터 연동할지 막막하다면</div>
+            <div class="a">급여가 들어오는 계좌 1개 + 자주 쓰는 카드 1장부터 추천해요. 궁금한 점은 여기서 바로 물어보세요.</div>
+            <div class="note">연동 안내 문구 개인화 · 1차 문의 응대(사람 상담 연결 버튼 유지)</div>
+          </div>
+          <div class="card row"><span class="chk on">✓</span><div><div class="item-nm">급여 계좌 · 은행 A</div><div class="item-sub">매달 25일 입금 감지 [가정]</div></div></div>
+          <div class="card row"><span class="chk on">✓</span><div><div class="item-nm">생활비 카드 · 카드사 B</div><div class="item-sub">최근 3개월 사용 [가정]</div></div></div>
+          <div class="card row"><span class="chk"></span><div><div class="item-nm">비상금 계좌 · 은행 C</div><div class="item-sub">나중에 추가 가능</div></div></div>
+          <div class="row" style="align-items:flex-start;"><span class="chk on" style="margin-top:1px;">✓</span><div class="fine">본인신용정보 전송요구(마이데이터)에 동의합니다. 동의 문구·인증 방식·보관 기간은 <b>컴플라이언스 확인 필요</b> [확인 필요]</div></div>
+          <div class="spacer"></div>
+          <div class="btn btn-primary">선택한 2개 연동하기</div>
+        </div>
+        <div class="stamp">교육용 가상 화면 · 실제 기관·상품 없음</div>
+      </div>
+    </div>
+    <dl class="annot">
+      <dt>지면</dt><dd>온보딩 · 계좌·카드 연동(마이데이터 전송요구 동의)</dd>
+      <dt>AI 활용점</dt><dd>연동 안내 문구 개인화 · 고객 문의 1차 응대(사람 연결 유지)</dd>
+      <dt>측정 이벤트</dt><dd><code>link_account</code> — 연동 완료 시 1회</dd>
+    </dl>
+  </div>
+
+  <!-- 02 홈 대시보드 · 소비 요약 -->
+  <div class="col">
+    <div class="cap"><span class="tag">02 HOME</span><span class="nm">홈 대시보드 · 소비 요약</span></div>
+    <div class="phone"><div class="notch"></div><div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="scr">
+        <div class="topbar"><span class="tb-title">8월 소비 요약</span><span class="tb-side">계좌 2개 연동 중</span></div>
+        <div class="pad" style="gap:9px;">
+          <div>
+            <div class="lead">이번 달 쓴 돈</div>
+            <div class="kpi">1,284,300원<small>[가정]</small></div>
+            <div class="fine">지난달보다 6% 적어요 · 자동 분류 정확도 94% [가정]</div>
+          </div>
+          <div class="bars">
+            <div class="bar"><span class="lab">식비</span><span class="track"><span class="fill hi" style="width:34%"></span></span><span class="val">34%</span></div>
+            <div class="bar"><span class="lab">쇼핑</span><span class="track"><span class="fill" style="width:27%"></span></span><span class="val">27%</span></div>
+            <div class="bar"><span class="lab">여가</span><span class="track"><span class="fill" style="width:14%"></span></span><span class="val">14%</span></div>
+            <div class="bar"><span class="lab">공과금</span><span class="track"><span class="fill" style="width:10%"></span></span><span class="val">10%</span></div>
+            <div class="bar"><span class="lab">교통</span><span class="track"><span class="fill" style="width:9%"></span></span><span class="val">9%</span></div>
+            <div class="bar"><span class="lab">구독</span><span class="track"><span class="fill" style="width:6%"></span></span><span class="val">6%</span></div>
+          </div>
+          <div class="ai">
+            <div class="q">🤖 이번 달 배달비가 지난 3개월 평균보다 18% 높아요 [가정]</div>
+            <div class="a">분류가 틀린 거래는 눌러서 고치세요 → 다음 달 분류에 반영돼요.</div>
+            <div class="note">거래 자동 카테고리 분류 · 월간 요약 · 소비 패턴 인사이트 문구(수치는 재계산 후 노출)</div>
+          </div>
+          <div class="card" style="border-color:var(--color-action-blue);">
+            <div class="item-nm">아직 저축 목표가 없어요</div>
+            <div class="item-sub" style="margin-top:2px;">목표를 세우면 매주 코칭 카드를 보내 드려요.</div>
+            <div class="btn btn-primary" style="margin-top:8px;padding:9px;">저축 목표 세우기 →</div>
+          </div>
+          <div class="spacer"></div>
+        </div>
+        <div class="tabbar"><span class="on">홈</span><span>소비</span><span>목표</span><span>코칭</span></div>
+        <div class="stamp" style="bottom:50px;">교육용 가상 화면 · 수치 [가정]</div>
+      </div>
+    </div>
+    <dl class="annot">
+      <dt>지면</dt><dd>홈 대시보드 · 월간 소비 요약(카테고리 비중 · 전월 대비)</dd>
+      <dt>AI 활용점</dt><dd>거래 자동 분류 · 월간 요약 · 소비 인사이트 문구 · 오분류 피드백 학습</dd>
+      <dt>측정 이벤트</dt><dd><code>d30_active</code>(30일 재방문) · 목표 CTA 탭 → <code>set_goal</code> 진입</dd>
+    </dl>
+  </div>
+
+  <!-- 03 목표 설정 (2단계) -->
+  <div class="col">
+    <div class="cap"><span class="tag">03 GOAL</span><span class="nm">목표 설정 · 2단계</span></div>
+    <div class="phone"><div class="notch"></div><div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="scr">
+        <div class="topbar"><span class="tb-side">← 저축 목표</span><span class="tb-side"><b style="color:var(--color-ink);">2</b> / 2</span></div>
+        <div class="pad">
+          <div class="chip on" style="align-self:flex-start;">✓ 1단계 · 목적: 비상금 300만 원 [가정]</div>
+          <h2 class="t">매달 얼마씩<br/>모을까요?</h2>
+          <div class="chiprow"><span class="chip">20만 원</span><span class="chip on">30만 원</span><span class="chip">50만 원</span><span class="chip">직접 입력</span></div>
+          <div class="ai">
+            <div class="q">🤖 월 30만 원이면 10개월 뒤 300만 원에 도달해요 [가정]</div>
+            <div class="prog"><i style="width:10%"></i></div>
+            <div class="a">배달비를 월 2만 원 줄이면 한 달 빨라져요. 목표 금액·기간을 바꾸면 바로 다시 계산해 드려요.</div>
+            <div class="note">목표 달성 시뮬레이션 설명 — 정보 제공 범위, 투자 권유 아님(컴플라이언스 확인 필요)</div>
+          </div>
+          <div class="card row" style="justify-content:space-between;"><div><div class="item-nm">자동이체 날짜</div><div class="item-sub">급여일 다음 날 · 매달 26일 [가정]</div></div><span class="tb-side">변경 ›</span></div>
+          <div class="spacer"></div>
+          <div class="btn btn-primary">목표 확정하고 코칭 받기</div>
+          <div class="btn btn-ghost" style="padding:9px;">1단계로 돌아가기</div>
+        </div>
+        <div class="stamp">교육용 가상 화면 · 수치 [가정]</div>
+      </div>
+    </div>
+    <dl class="annot">
+      <dt>지면</dt><dd>목표 설정 · 1단계 목적 선택 → 2단계 월 금액·자동이체 날짜</dd>
+      <dt>AI 활용점</dt><dd>목표 달성 시뮬레이션 설명(정보 제공 범위) · 금액 제안은 사용자 선택 뒤에만</dd>
+      <dt>측정 이벤트</dt><dd><code>set_goal</code> — 목표 확정 시 1회</dd>
+    </dl>
+  </div>
+
+  <!-- 04 AI 코칭 카드 · 첫 저축 넛지 -->
+  <div class="col">
+    <div class="cap"><span class="tag">04 COACH</span><span class="nm">AI 코칭 카드 · 첫 저축 넛지</span></div>
+    <div class="phone"><div class="notch"></div><div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="scr">
+        <div class="topbar"><span class="tb-title">이번 주 코칭</span><span class="tb-side">🔔</span></div>
+        <div class="pad">
+          <div class="ai">
+            <div class="q">🤖 비상금 목표까지 첫걸음이 남았어요</div>
+            <div class="a">이번 주 배달비를 2만 원 줄이면 첫 저축 5만 원이 가능해요. 지난주보다 외식이 1회 적었어요 [가정].</div>
+            <div class="note">목표 기준 개인화 코칭 문구 — 톤·빈도는 사람이 검수, 금융상품 권유 문구 금지</div>
+          </div>
+          <div class="card" style="border-color:var(--color-action-blue);background:var(--color-pearl);">
+            <div class="item-nm">첫 저축을 지금 시작해 볼까요?</div>
+            <div class="item-sub" style="margin-top:2px;">비상금 계좌로 50,000원 · 자동이체는 26일부터 [가정]</div>
+            <div class="btn btn-primary" style="margin-top:9px;">첫 저축 50,000원 지금 실행</div>
+            <div style="text-align:center;font-size:11px;color:var(--color-action-blue);margin-top:8px;">내일 다시 알려주기</div>
+          </div>
+          <div class="lead" style="margin-top:2px;">지난 코칭</div>
+          <div class="card row" style="justify-content:space-between;"><div><div class="item-nm">구독 중복 2건 발견</div><div class="item-sub">8/28 · 1건 해지로 월 9,900원 절약 [가정]</div></div><span class="tb-side">✓</span></div>
+          <div class="card row" style="justify-content:space-between;"><div><div class="item-nm">주말 카페 지출 알림</div><div class="item-sub">8/21 · 확인함</div></div><span class="tb-side">✓</span></div>
+          <div class="spacer"></div>
+        </div>
+        <div class="tabbar"><span>홈</span><span>소비</span><span>목표</span><span class="on">코칭</span></div>
+        <div class="stamp" style="bottom:50px;">교육용 가상 화면 · 수치 [가정]</div>
+      </div>
+    </div>
+    <dl class="annot">
+      <dt>지면</dt><dd>AI 코칭 카드 · 첫 저축 넛지(원탭 실행 · 미루기)</dd>
+      <dt>AI 활용점</dt><dd>목표·소비 패턴 기반 개인화 코칭 문구 · 실행 제안(권유 아님, 사람 검수)</dd>
+      <dt>측정 이벤트</dt><dd><code>first_saving</code> — 첫 저축 실행 시 1회 · 이후 <code>d30_active</code></dd>
+    </dl>
+  </div>
+
+</div>
+
+<div class="foot">
+  <span class="lg"><span class="sw"></span> AI 적용 지점 — Action Blue(#0066cc) 박스 + 라벨</span>
+  <span>퍼널: signup → <code style="color:#fff">link_account</code> → <code style="color:#fff">set_goal</code> → <code style="color:#fff">first_saving</code> → <code style="color:#fff">d30_active</code></span>
+  <span>토큰 출처: docs/design-system/tokens (Apple 토큰) · 화면은 가상 · 브랜드·접근성·보안 문구는 디자인·컴플라이언스 확인</span>
+</div>
+
+</body>
+</html>

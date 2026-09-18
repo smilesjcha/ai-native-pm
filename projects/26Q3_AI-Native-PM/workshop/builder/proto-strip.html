@@ -1,0 +1,17 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>머니핏 프로토타입 5화면</title>
+<style>
+  html,body{margin:0;background:#1d1d1f;font-family:"NanumGothic","Apple SD Gothic Neo",sans-serif;}
+  .row{width:1400px;height:520px;display:flex;justify-content:center;align-items:flex-start;gap:34px;padding-top:18px;box-sizing:border-box;}
+  .item{display:flex;flex-direction:column;align-items:center;}
+  /* 원본 960×1840 중 디바이스 영역(92,78)~(868,1762) → 0.25배 표시(194×421) */
+  .dev{width:194px;height:421px;border-radius:27px;overflow:hidden;background-size:240px 460px;background-position:-23px -19.5px;background-repeat:no-repeat;box-shadow:0 12px 36px rgba(0,0,0,.55);}
+  .no{margin-top:14px;font-size:11px;letter-spacing:1.5px;color:#2997ff;font-weight:700;}
+  .cap{margin-top:3px;font-size:14px;color:#f5f5f7;font-weight:700;}
+  .ev{margin-top:2px;font-size:11px;color:#86868b;font-family:Menlo,monospace;}
+</style></head><body><div class="row">
+  <div class="item"><div class="dev" style="background-image:url('../../assets/builder/moneyfit-proto-01-link.png')"></div><div class="no">01</div><div class="cap">계좌 연동</div><div class="ev">link_account</div></div>
+  <div class="item"><div class="dev" style="background-image:url('../../assets/builder/moneyfit-proto-02-summary.png')"></div><div class="no">02</div><div class="cap">소비 요약</div><div class="ev">d30_active</div></div>
+  <div class="item"><div class="dev" style="background-image:url('../../assets/builder/moneyfit-proto-03-goal.png')"></div><div class="no">03</div><div class="cap">목표 설정</div><div class="ev">set_goal</div></div>
+  <div class="item"><div class="dev" style="background-image:url('../../assets/builder/moneyfit-proto-04-coach.png')"></div><div class="no">04</div><div class="cap">AI 코칭</div><div class="ev">coach_view</div></div>
+  <div class="item"><div class="dev" style="background-image:url('../../assets/builder/moneyfit-proto-05-done.png')"></div><div class="no">05</div><div class="cap">첫 저축 완료</div><div class="ev">first_saving</div></div>
+</div></body></html>

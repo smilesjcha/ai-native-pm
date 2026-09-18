@@ -1,0 +1,11 @@
+# 스모크 테스트 산출물·임시 스크립트 (커밋 대상 아님)
+_smoke*
+
+# Node
+node_modules/
+
+# Office 임시 잠금 파일
+~$*
+
+# PDF는 커밋 대상이므로 제외하지 않는다
+*.inspect.ndjson

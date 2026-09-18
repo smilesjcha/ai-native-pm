@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>머니핏(MoneyFit) — 동작 프로토타입 (교육용 가상 사례)</title>
+<style>
+  /* ── 디자인 토큰 (docs/design-system/tokens/tokens.css 필수 토큰 인라인 — 단일 파일 원칙) ── */
+  :root{
+    --action:#0066cc; --focus:#0071e3; --sky:#2997ff;
+    --ink:#1d1d1f; --ink80:#333333; --ink48:#7a7a7a;
+    --canvas:#ffffff; --parchment:#f5f5f7; --pearl:#fafafc; --tile:#272729;
+    --hair:#e0e0e0; --divider:#f0f0f0; --ai-tint:#eef5ff;
+    --font:"Apple SD Gothic Neo","NanumGothic","Nanum Gothic","Malgun Gothic",system-ui,-apple-system,sans-serif;
+    --r-xs:5px; --r-sm:8px; --r-md:11px; --r-lg:18px; --r-pill:9999px;
+    --shadow-product:3px 5px 30px rgba(0,0,0,.22);
+  }
+  *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{font-family:var(--font);background:radial-gradient(1200px 800px at 50% -10%, #2a2a2e, #161618);
+    display:grid;place-items:center;color:var(--ink);-webkit-font-smoothing:antialiased;}
+  .device{width:390px;height:844px;background:#000;border-radius:54px;padding:11px;position:relative;
+    box-shadow:0 40px 120px rgba(0,0,0,.6), inset 0 0 0 2px #2c2c2e;}
+  .viewport{width:100%;height:100%;background:var(--canvas);border-radius:44px;overflow:hidden;position:relative;}
+  .notch{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:128px;height:30px;background:#000;border-radius:18px;z-index:30;}
+  .status{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:flex-end;justify-content:space-between;
+    padding:0 30px 8px;font-size:14px;font-weight:600;z-index:20;color:var(--ink);pointer-events:none;}
+  .status.dark{color:#fff;}
+
+  .screen{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;visibility:hidden;
+    transform:translateX(24px);transition:opacity .42s ease, transform .42s cubic-bezier(.4,0,.2,1);background:var(--canvas);}
+  .screen.active{opacity:1;visibility:visible;transform:none;z-index:10;}
+  .screen.dark{background:var(--tile);color:#fff;}
+  body.noanim .screen{transition:none;}
+  .body{flex:1;overflow:hidden;padding:64px 22px 22px;display:flex;flex-direction:column;gap:12px;}
+  .step{font-size:13px;color:var(--ink48);}
+  h1.t{font-weight:600;letter-spacing:-.6px;line-height:1.18;font-size:27px;}
+  h1.t.sm{font-size:22px;}
+  .lead{font-size:14px;color:var(--ink48);line-height:1.5;}
+  .spacer{flex:1;}
+
+  .btn{display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font);font-size:16px;font-weight:600;
+    border:none;cursor:pointer;transition:transform .12s ease, background .15s ease, opacity .15s;width:100%;}
+  .btn:active{transform:scale(.96);}
+  .btn-primary{background:var(--action);color:#fff;border-radius:var(--r-pill);padding:15px;}
+  .btn-primary[disabled]{opacity:.35;pointer-events:none;}
+  .btn-ghost{background:transparent;color:var(--action);border:1px solid var(--action);border-radius:var(--r-pill);padding:13px;font-weight:400;}
+  .link{color:var(--action);font-size:14px;text-align:center;cursor:pointer;}
+
+  .subnav{height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;margin-top:54px;
+    background:rgba(245,245,247,.82);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--divider);
+    font-weight:600;font-size:17px;flex:0 0 50px;}
+  .subnav .re{font-size:14px;color:var(--action);font-weight:400;cursor:pointer;}
+  .subnav .mut{font-size:13px;color:var(--ink48);font-weight:400;}
+  .body.under{padding-top:16px;}
+
+  /* AI 적용 지점 */
+  .ai{position:relative;border:2px solid var(--action);border-radius:16px;background:var(--ai-tint);padding:14px 14px 12px;}
+  .ai::before{content:"AI";position:absolute;top:-10px;left:12px;background:var(--action);color:#fff;font-size:11px;font-weight:700;padding:1px 9px;border-radius:6px;letter-spacing:.3px;}
+  .ai .q{font-size:15px;font-weight:600;line-height:1.4;}
+  .ai .a{font-size:13px;color:var(--action);margin-top:5px;line-height:1.45;}
+  .ai .note{font-size:11px;color:var(--ink48);margin-top:5px;line-height:1.4;}
+
+  .card{border:1px solid var(--hair);border-radius:var(--r-md);padding:12px 14px;background:#fff;cursor:pointer;transition:border .15s,transform .12s;}
+  .card:active{transform:scale(.99);}
+  .row{display:flex;align-items:center;gap:10px;}
+  .chk{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--hair);flex:0 0 20px;display:grid;place-items:center;font-size:12px;color:#fff;transition:background .15s,border-color .15s;}
+  .card.on .chk{background:var(--action);border-color:var(--action);}
+  .card.on{border-color:var(--action);}
+  .item-nm{font-size:15px;font-weight:600;}
+  .item-sub{font-size:12px;color:var(--ink48);margin-top:1px;}
+  .fine{font-size:11px;color:var(--ink48);line-height:1.45;}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;}
+  .chip{border:1px solid var(--hair);border-radius:var(--r-pill);padding:9px 14px;font-size:14px;cursor:pointer;background:#fff;transition:border .15s,transform .12s;}
+  .chip:active{transform:scale(.97);}
+  .chip.sel{border:2px solid var(--focus);font-weight:600;background:#f7faff;}
+  .steps{display:flex;gap:5px;}
+  .steps i{width:22px;height:4px;border-radius:2px;background:var(--hair);display:block;}
+  .steps i.on{background:var(--action);}
+
+  /* summary */
+  .kpi{font-size:32px;font-weight:700;letter-spacing:-.8px;line-height:1.1;}
+  .kpi small{font-size:13px;font-weight:400;color:var(--ink48);margin-left:6px;letter-spacing:0;}
+  .bars{display:flex;flex-direction:column;gap:8px;}
+  .bar{display:grid;grid-template-columns:44px 1fr 36px;align-items:center;gap:10px;font-size:13px;}
+  .bar .lab{color:var(--ink80);}
+  .bar .track{height:10px;background:var(--parchment);border-radius:5px;overflow:hidden;}
+  .bar .fill{display:block;height:100%;width:0;background:var(--ink48);border-radius:5px;transition:width .9s cubic-bezier(.2,.7,.2,1);}
+  .bar .fill.hi{background:var(--action);}
+  .screen.active .bar .fill{width:var(--w);}
+  .bar .val{text-align:right;color:var(--ink48);}
+  .tabbar{height:64px;border-top:1px solid var(--divider);display:flex;align-items:center;justify-content:space-around;font-size:11px;color:var(--ink48);flex:0 0 64px;padding-bottom:10px;}
+  .tabbar .on{color:var(--action);font-weight:700;}
+
+  /* loading */
+  .center{align-items:center;text-align:center;justify-content:center;gap:16px;}
+  .spinner{width:56px;height:56px;border-radius:50%;border:5px solid rgba(255,255,255,.2);border-top-color:#fff;animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .tagpill{font-size:13px;color:var(--sky);border:1px solid rgba(41,151,255,.5);padding:6px 12px;border-radius:var(--r-pill);}
+
+  /* goal */
+  .gstep{display:none;flex-direction:column;gap:12px;flex:1;}
+  .gstep.on{display:flex;}
+  .prog{height:10px;background:#dfe9f7;border-radius:5px;overflow:hidden;margin-top:8px;}
+  .prog i{display:block;height:100%;width:0;background:var(--action);border-radius:5px;transition:width .7s ease;}
+
+  /* done */
+  .check{width:104px;height:104px;border-radius:50%;background:var(--action);display:grid;place-items:center;color:#fff;font-size:52px;
+    transform:scale(.4);opacity:0;transition:transform .5s cubic-bezier(.2,.9,.3,1.3), opacity .3s;}
+  .screen.active .check{transform:scale(1);opacity:1;}
+
+  /* toasts */
+  .toast{position:absolute;left:24px;right:24px;bottom:34px;background:var(--ink);color:#fff;border-radius:var(--r-md);
+    padding:13px 16px;font-size:14px;display:flex;align-items:center;gap:10px;opacity:0;transform:translateY(12px);
+    transition:opacity .3s,transform .3s;z-index:25;pointer-events:none;}
+  .toast.show{opacity:1;transform:none;}
+  .evt{position:absolute;left:50%;transform:translateX(-50%) translateY(-8px);top:62px;background:rgba(0,102,204,.92);color:#fff;
+    font-family:"SF Mono",ui-monospace,Menlo,monospace;font-size:11.5px;padding:6px 12px;border-radius:var(--r-pill);opacity:0;transition:opacity .3s,transform .3s;z-index:26;pointer-events:none;white-space:nowrap;}
+  .evt.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .stamp{position:absolute;left:0;right:0;bottom:6px;text-align:center;font-size:10px;color:var(--ink48);z-index:15;pointer-events:none;}
+  .screen.dark ~ .stamp{color:#aaa;}
+
+  /* fake cursor */
+  #cursor{position:absolute;width:26px;height:26px;left:-60px;top:-60px;z-index:999;pointer-events:none;
+    transition:left .7s cubic-bezier(.5,0,.2,1), top .7s cubic-bezier(.5,0,.2,1);filter:drop-shadow(0 3px 5px rgba(0,0,0,.4));}
+  #cursor.click .ring{transform:scale(1);opacity:1;}
+  #cursor .ring{position:absolute;left:-8px;top:-8px;width:42px;height:42px;border-radius:50%;background:rgba(0,102,204,.3);
+    transform:scale(.2);opacity:0;transition:transform .35s ease, opacity .35s ease;}
+  .demo-badge{position:absolute;top:18px;left:18px;z-index:998;background:rgba(0,0,0,.6);color:#fff;font-size:11px;
+    padding:5px 10px;border-radius:var(--r-pill);display:none;}
+  body.demo .demo-badge{display:block;}
+</style>
+</head>
+<body>
+<div class="device">
+  <div class="notch"></div>
+  <div class="viewport" id="viewport">
+    <div class="demo-badge">▶ AUTO DEMO</div>
+
+    <!-- 1 link — 온보딩 · 계좌 연동 -->
+    <section class="screen active" data-screen="link">
+      <div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="body">
+        <div class="row" style="justify-content:space-between;"><b style="color:var(--action);font-size:17px;">머니핏</b><div class="steps"><i class="on"></i><i></i><i></i></div></div>
+        <h1 class="t">내 돈이 어디로 가는지,<br/>3분이면 보여요</h1>
+        <div class="lead">계좌·카드를 연동하면 소비를 자동으로 분류하고 월간 요약을 만들어 드려요.</div>
+        <div class="ai">
+          <div class="q">🤖 어디부터 연동할지 막막하다면</div>
+          <div class="a">급여 계좌 1개 + 자주 쓰는 카드 1장부터 추천해요. 궁금한 점은 여기서 바로 물어보세요.</div>
+        </div>
+        <div class="card on row" data-link><span class="chk">✓</span><div><div class="item-nm">급여 계좌 · 은행 A</div><div class="item-sub">매달 25일 입금 감지 [가정]</div></div></div>
+        <div class="card on row" data-link><span class="chk">✓</span><div><div class="item-nm">생활비 카드 · 카드사 B</div><div class="item-sub">최근 3개월 사용 [가정]</div></div></div>
+        <div class="card row" data-link><span class="chk">✓</span><div><div class="item-nm">비상금 계좌 · 은행 C</div><div class="item-sub">나중에 추가 가능</div></div></div>
+        <div class="row" style="align-items:flex-start;"><span class="chk" style="background:var(--action);border-color:var(--action);margin-top:2px;">✓</span><div class="fine">본인신용정보 전송요구(마이데이터)에 동의합니다. 동의 문구·인증 방식은 <b>컴플라이언스 확인 필요</b> [확인 필요]</div></div>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" id="linkCta" data-go="loading">선택한 2개 연동하기</button>
+      </div>
+    </section>
+
+    <!-- loading -->
+    <section class="screen dark" data-screen="loading">
+      <div class="status dark"><span>9:41</span><span>5G ▮</span></div>
+      <div class="body center">
+        <div class="spinner"></div>
+        <h1 class="t sm" style="color:#fff;margin-top:20px;">계좌를 연동하고<br/>거래를 분류하고 있어요</h1>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+          <span class="tagpill">거래 1,248건 [가정]</span><span class="tagpill">카테고리 7개</span><span class="tagpill">중복 검사</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 summary — 홈 대시보드 · 소비 요약 -->
+    <section class="screen" data-screen="summary">
+      <div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="subnav"><span>8월 소비 요약</span><span class="mut" id="linkCount">계좌 2개 연동 중</span></div>
+      <div class="body under" style="gap:11px;">
+        <div>
+          <div class="step">이번 달 쓴 돈</div>
+          <div class="kpi">1,284,300원<small>[가정]</small></div>
+          <div class="fine">지난달보다 6% 적어요 · 자동 분류 정확도 94% [가정]</div>
+        </div>
+        <div class="bars">
+          <div class="bar"><span class="lab">식비</span><span class="track"><span class="fill hi" style="--w:34%"></span></span><span class="val">34%</span></div>
+          <div class="bar"><span class="lab">쇼핑</span><span class="track"><span class="fill" style="--w:27%"></span></span><span class="val">27%</span></div>
+          <div class="bar"><span class="lab">여가</span><span class="track"><span class="fill" style="--w:14%"></span></span><span class="val">14%</span></div>
+          <div class="bar"><span class="lab">공과금</span><span class="track"><span class="fill" style="--w:10%"></span></span><span class="val">10%</span></div>
+          <div class="bar"><span class="lab">교통</span><span class="track"><span class="fill" style="--w:9%"></span></span><span class="val">9%</span></div>
+          <div class="bar"><span class="lab">구독</span><span class="track"><span class="fill" style="--w:6%"></span></span><span class="val">6%</span></div>
+        </div>
+        <div class="ai">
+          <div class="q">🤖 이번 달 배달비가 지난 3개월 평균보다 18% 높아요 [가정]</div>
+          <div class="a">분류가 틀린 거래는 눌러서 고치세요 → 다음 달 분류에 반영돼요.</div>
+        </div>
+        <div class="card" style="border-color:var(--action);" data-go="goal">
+          <div class="item-nm">아직 저축 목표가 없어요</div>
+          <div class="item-sub">목표를 세우면 매주 코칭 카드를 보내 드려요.</div>
+          <button class="btn btn-primary" style="margin-top:10px;padding:11px;" data-go="goal">저축 목표 세우기 →</button>
+        </div>
+        <div class="spacer"></div>
+      </div>
+      <div class="tabbar"><span class="on">홈</span><span>소비</span><span>목표</span><span>코칭</span></div>
+    </section>
+
+    <!-- 3 goal — 목표 설정 (2단계) -->
+    <section class="screen" data-screen="goal">
+      <div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="subnav"><span class="re" data-go="summary">← 저축 목표</span><span class="mut"><b id="gnum" style="color:var(--ink);">1</b> / 2</span></div>
+      <div class="body under">
+        <!-- step 1 -->
+        <div class="gstep on" data-step="1">
+          <h1 class="t">무엇을 위해<br/>모을까요?</h1>
+          <div class="chips">
+            <span class="chip" data-purpose="비상금">비상금</span><span class="chip" data-purpose="여행">여행</span>
+            <span class="chip" data-purpose="전세 보증금">전세 보증금</span><span class="chip" data-purpose="직접 입력">직접 입력</span>
+          </div>
+          <div class="step" style="margin-top:6px;">목표 금액 [가정]</div>
+          <div class="chips">
+            <span class="chip" data-target="1000000">100만 원</span><span class="chip" data-target="3000000">300만 원</span><span class="chip" data-target="5000000">500만 원</span>
+          </div>
+          <div class="fine">금액 제안은 사용자가 선택한 뒤에만 표시 — 금융상품 권유가 아닌 정보 제공 범위(컴플라이언스 확인 필요)</div>
+          <div class="spacer"></div>
+          <button class="btn btn-primary" id="gnext" data-gstep="2" disabled>다음</button>
+        </div>
+        <!-- step 2 -->
+        <div class="gstep" data-step="2">
+          <span class="chip sel" id="gsum" style="align-self:flex-start;">✓ 1단계 · 비상금 300만 원 [가정]</span>
+          <h1 class="t">매달 얼마씩<br/>모을까요?</h1>
+          <div class="chips">
+            <span class="chip" data-monthly="200000">20만 원</span><span class="chip" data-monthly="300000">30만 원</span><span class="chip" data-monthly="500000">50만 원</span>
+          </div>
+          <div class="ai">
+            <div class="q" id="simQ">🤖 월 금액을 고르면 도달 시점을 계산해 드려요</div>
+            <div class="prog"><i id="simBar"></i></div>
+            <div class="a" id="simA">목표 금액·기간을 바꾸면 바로 다시 계산해요.</div>
+            <div class="note">목표 달성 시뮬레이션 설명 — 정보 제공 범위, 투자 권유 아님(컴플라이언스 확인 필요)</div>
+          </div>
+          <div class="card row" style="justify-content:space-between;"><div><div class="item-nm">자동이체 날짜</div><div class="item-sub">급여일 다음 날 · 매달 26일 [가정]</div></div><span class="mut" style="color:var(--ink48);font-size:13px;">변경 ›</span></div>
+          <div class="spacer"></div>
+          <button class="btn btn-primary" id="gconfirm" data-go="coach" disabled>목표 확정하고 코칭 받기</button>
+          <div class="link" data-gstep="1">1단계로 돌아가기</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 coach — AI 코칭 카드 · 첫 저축 넛지 -->
+    <section class="screen" data-screen="coach">
+      <div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="subnav"><span>이번 주 코칭</span><span class="mut">🔔</span></div>
+      <div class="body under">
+        <div class="ai">
+          <div class="q" id="coachQ">🤖 비상금 목표까지 첫걸음이 남았어요</div>
+          <div class="a" id="coachA">이번 주 배달비를 2만 원 줄이면 첫 저축 5만 원이 가능해요. 지난주보다 외식이 1회 적었어요 [가정].</div>
+          <div class="note">목표 기준 개인화 코칭 문구 — 톤·빈도는 사람이 검수, 금융상품 권유 문구 금지</div>
+        </div>
+        <div class="card" style="border-color:var(--action);background:var(--pearl);cursor:default;">
+          <div class="item-nm">첫 저축을 지금 시작해 볼까요?</div>
+          <div class="item-sub">비상금 계좌로 50,000원 · 자동이체는 26일부터 [가정]</div>
+          <button class="btn btn-primary" style="margin-top:12px;" data-go="done">첫 저축 50,000원 지금 실행</button>
+          <div class="link" style="margin-top:10px;" data-snooze>내일 다시 알려주기</div>
+        </div>
+        <div class="step">지난 코칭</div>
+        <div class="card row" style="justify-content:space-between;cursor:default;"><div><div class="item-nm">구독 중복 2건 발견</div><div class="item-sub">8/28 · 1건 해지로 월 9,900원 절약 [가정]</div></div><span style="color:var(--ink48);">✓</span></div>
+        <div class="card row" style="justify-content:space-between;cursor:default;"><div><div class="item-nm">주말 카페 지출 알림</div><div class="item-sub">8/21 · 확인함</div></div><span style="color:var(--ink48);">✓</span></div>
+        <div class="spacer"></div>
+      </div>
+      <div class="tabbar"><span>홈</span><span>소비</span><span>목표</span><span class="on">코칭</span></div>
+    </section>
+
+    <!-- 5 done — 첫 저축 완료 -->
+    <section class="screen" data-screen="done">
+      <div class="status"><span>9:41</span><span>5G ▮</span></div>
+      <div class="body center" style="background:var(--parchment);">
+        <div class="check">✓</div>
+        <h1 class="t" style="margin-top:10px;">첫 저축 50,000원<br/>완료했어요</h1>
+        <div class="lead" id="doneLead">비상금 300만 원 목표의 1.7% · 다음 자동이체 26일 [가정]</div>
+        <div class="ai" style="text-align:left;width:100%;">
+          <div class="q">🤖 시작이 제일 어려운데, 해냈어요</div>
+          <div class="a">이 속도면 10개월 뒤 목표에 도달해요. 30일 뒤 다시 만나면 첫 달 리포트를 드릴게요 [가정].</div>
+          <div class="note">개인화 축하·다음 행동 안내 문구 — 사람이 검수한 문구 풀에서 선택</div>
+        </div>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" data-go="summary" data-reset-goal>홈으로</button>
+        <div class="link" data-restart>처음부터 다시 보기</div>
+      </div>
+    </section>
+
+    <div class="toast" id="toast">✓ 내일 오전 9시에 다시 알려 드릴게요</div>
+    <div class="evt" id="evt">📍 event · link_account</div>
+    <div class="stamp">교육용 가상 프로토타입 · 머니핏(MoneyFit) by 핀트리(FinTree) · 수치 [가정]</div>
+  </div>
+</div>
+
+<svg id="cursor" viewBox="0 0 24 24"></svg>
+
+<script>
+const V = document.getElementById('viewport');
+const $ = (s, root = V) => root.querySelector(s);
+const $$ = (s, root = V) => Array.from(root.querySelectorAll(s));
+const state = { purpose: null, target: null, monthly: null };
+const KRW = n => n.toLocaleString('ko-KR') + '원';
+const MAN = n => (n / 10000).toLocaleString('ko-KR') + '만 원';
+
+/* ── 이벤트(측정) 표시: 실제 로깅이 아니라 "여기서 이 이벤트가 찍힌다"를 보여주는 UI ── */
+let evtTimer;
+function fireEvent(name){
+  const e = $('#evt'); e.textContent = '📍 event · ' + name; e.classList.add('show');
+  clearTimeout(evtTimer); evtTimer = setTimeout(() => e.classList.remove('show'), 2000);
+}
+
+/* ── 화면 상태기계 ── */
+function show(id){
+  $$('.screen').forEach(s => s.classList.toggle('active', s.dataset.screen === id));
+  if (id === 'loading'){ clearTimeout(show._t); show._t = setTimeout(() => { show('summary'); fireEvent('link_account'); }, 1800); }
+}
+function goalStep(n){
+  $$('.gstep').forEach(g => g.classList.toggle('on', g.dataset.step === String(n)));
+  $('#gnum').textContent = n;
+  if (n === 2 && state.purpose && state.target) $('#gsum').textContent = `✓ 1단계 · ${state.purpose} ${MAN(state.target)} [가정]`;
+}
+function updateSim(){
+  if (!state.monthly || !state.target) return;
+  const months = Math.ceil(state.target / state.monthly);
+  const d = new Date(2026, 8 + months, 26); // 시연용 기준월 2026-09 [가정]
+  const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  $('#simQ').textContent = `🤖 월 ${MAN(state.monthly)}이면 ${months}개월 뒤(${ym}) ${MAN(state.target)}에 도달해요 [가정]`;
+  $('#simA').textContent = `배달비를 월 2만 원 줄이면 약 ${Math.max(1, Math.round(20000 * months / state.monthly))}개월 빨라져요. 금액·기간을 바꾸면 바로 다시 계산해요.`;
+  $('#simBar').style.width = Math.max(6, Math.round(50000 / state.target * 100 * 6)) + '%';
+  $('#gconfirm').disabled = false;
+  $('#doneLead').textContent = `${state.purpose} ${MAN(state.target)} 목표의 ${(50000 / state.target * 100).toFixed(1)}% · 다음 자동이체 26일 [가정]`;
+  $('#coachQ').textContent = `🤖 ${state.purpose} 목표까지 첫걸음이 남았어요`;
+}
+function updateLinkCta(){
+  const n = $$('[data-link].on').length;
+  const cta = $('#linkCta'); cta.textContent = n ? `선택한 ${n}개 연동하기` : '연동할 계좌를 선택하세요'; cta.disabled = !n;
+  $('#linkCount').textContent = `계좌 ${n}개 연동 중`;
+}
+
+V.addEventListener('click', (e) => {
+  const t = e.target;
+  const link = t.closest('[data-link]'); if (link){ link.classList.toggle('on'); updateLinkCta(); return; }
+  const purpose = t.closest('[data-purpose]'); if (purpose){ $$('[data-purpose]').forEach(c => c.classList.toggle('sel', c === purpose)); state.purpose = purpose.dataset.purpose; }
+  const target = t.closest('[data-target]'); if (target){ $$('[data-target]').forEach(c => c.classList.toggle('sel', c === target)); state.target = +target.dataset.target; }
+  if (purpose || target){ $('#gnext').disabled = !(state.purpose && state.target); return; }
+  const monthly = t.closest('[data-monthly]'); if (monthly){ $$('[data-monthly]').forEach(c => c.classList.toggle('sel', c === monthly)); state.monthly = +monthly.dataset.monthly; updateSim(); return; }
+  const gs = t.closest('[data-gstep]'); if (gs){ goalStep(+gs.dataset.gstep); return; }
+  const snooze = t.closest('[data-snooze]'); if (snooze){ const to = $('#toast'); to.classList.add('show'); setTimeout(() => to.classList.remove('show'), 2000); return; }
+  const restart = t.closest('[data-restart]'); if (restart){ location.href = location.pathname; return; }
+  const go = t.closest('[data-go]');
+  if (go){
+    const id = go.dataset.go;
+    if (id === 'coach' && go.id === 'gconfirm') fireEvent('set_goal');
+    if (id === 'done') fireEvent('first_saving');
+    if (go.hasAttribute('data-reset-goal')) $('[data-screen="summary"] .card .item-nm').textContent = `${state.purpose || '비상금'} 목표 진행 중 · 다음 이체 26일`;
+    show(id);
+  }
+});
+
+/* ── ?screen=N : 캡처용 상태 고정 (1 link · 2 summary · 3 goal[&step=1|2] · 4 coach · 5 done) ── */
+const Q = new URLSearchParams(location.search);
+const MAP = { '1': 'link', '2': 'summary', '3': 'goal', '4': 'coach', '5': 'done' };
+function preset(screen){
+  document.body.classList.add('noanim');
+  // 앞 단계가 끝난 상태를 가정해 데이터 채움
+  state.purpose = '비상금'; state.target = 3000000; state.monthly = 300000;
+  $$('[data-purpose]')[0].classList.add('sel'); $$('[data-target]')[1].classList.add('sel'); $$('[data-monthly]')[1].classList.add('sel');
+  $('#gnext').disabled = false; updateSim();
+  if (screen === 'goal') goalStep(Q.get('step') === '2' ? 2 : 1);
+  show(screen);
+  setTimeout(() => document.body.classList.remove('noanim'), 100);
+}
+if (MAP[Q.get('screen')]) preset(MAP[Q.get('screen')]);
+
+/* ── AUTO DEMO (?demo=1): 가상 커서가 핵심 플로우를 클릭 → 끝나면 window.__DEMO_DONE__ = true ── */
+function demo(){
+  document.body.classList.add('demo');
+  const cursor = document.getElementById('cursor');
+  cursor.innerHTML = '<polygon points="3,2 3,20 8,15 12,21 14,20 10,14 17,14" fill="#111" stroke="#fff" stroke-width="1.2"/><circle class="ring" cx="3" cy="2" r="0"/>';
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  async function moveTo(sel, nth = 0){ const el = $$(sel)[nth]; if (!el) return null; const r = el.getBoundingClientRect();
+    cursor.style.left = (r.left + r.width / 2) + 'px'; cursor.style.top = (r.top + r.height / 2) + 'px'; await sleep(760); return el; }
+  async function click(sel, nth = 0){ const el = await moveTo(sel, nth); if (!el) return; cursor.classList.add('click'); await sleep(120);
+    el.dispatchEvent(new MouseEvent('click', { bubbles: true })); await sleep(260); cursor.classList.remove('click'); await sleep(360); }
+  (async () => {
+    cursor.style.left = '50%'; cursor.style.top = '90%'; await sleep(900);
+    await click('[data-link]', 2);                          // 비상금 계좌 추가 선택 → 3개
+    await click('#linkCta');                                // → loading(1.8s) → summary (link_account)
+    await sleep(3200);
+    await click('[data-screen="summary"] .btn[data-go="goal"]'); // → goal step 1
+    await sleep(500);
+    await click('[data-purpose]', 0);                       // 비상금
+    await click('[data-target]', 1);                        // 300만 원
+    await click('[data-gstep="2"]');                        // → step 2
+    await sleep(500);
+    await click('[data-monthly]', 1);                       // 30만 원 → AI 시뮬레이션
+    await sleep(1100);
+    await click('#gconfirm');                               // → coach (set_goal)
+    await sleep(2600);                                      // 코칭 카드를 읽을 시간
+    await click('[data-screen="coach"] .btn[data-go="done"]'); // → done (first_saving)
+    await sleep(2600);
+    document.querySelector('.demo-badge').textContent = '✓ DEMO END'; await sleep(800);
+    window.__DEMO_DONE__ = true;
+  })();
+}
+if (Q.get('demo') === '1'){ window.addEventListener('load', () => setTimeout(demo, 400)); }
+</script>
+</body>
+</html>

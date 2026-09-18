@@ -1,0 +1,71 @@
+{
+  "name": "Cha Sungjae Lecture PPT",
+  "version": "1.0.0",
+  "reference": "https://www.oppadu.com/tools/design-systems-site/brand/musinsa.html",
+  "principles": [
+    "Black and white are the default canvas.",
+    "Neutral gray carries hierarchy; navy and blue are reserved for information and current-step emphasis.",
+    "Use sharp 0-4px corners, flat surfaces, thin rules, and compact editorial spacing.",
+    "Let screenshots provide color; never tint product or service screenshots.",
+    "One slide has one teaching job and one takeaway title."
+  ],
+  "colors": {
+    "black": "#000000",
+    "ink": "#191919",
+    "gray900": "#2D2D2D",
+    "gray700": "#555555",
+    "gray500": "#888888",
+    "gray300": "#C7C7C7",
+    "gray200": "#E0E0E0",
+    "gray100": "#F0F0F0",
+    "gray050": "#F5F5F5",
+    "gray025": "#FAFAFA",
+    "white": "#FFFFFF",
+    "navy": "#0B1F3A",
+    "blue": "#2563EB",
+    "blueSoft": "#E0F0FE"
+  },
+  "typography": {
+    "koreanPreferred": "AppleGothic",
+    "koreanRuntimeFallback": "Arial Unicode MS",
+    "englishPreferred": "AppleGothic",
+    "monospace": "AppleGothic",
+    "deckTitlePt": 52,
+    "sectionTitlePt": 46,
+    "slideTitlePt": 32,
+    "leadPt": 25,
+    "bodyPt": 19,
+    "captionPt": 11,
+    "bodyMinimumPt": 16
+  },
+  "spacing": {
+    "base": 4,
+    "pageLeft": 64,
+    "pageRight": 64,
+    "pageTop": 40,
+    "pageBottom": 42,
+    "columnGap": 24,
+    "sectionGap": 32
+  },
+  "shape": {
+    "radiusDefault": 0,
+    "radiusMaximum": 4,
+    "borderWidth": 1,
+    "ruleWidth": 2,
+    "shadow": "none"
+  },
+  "slide": {
+    "width": 1280,
+    "height": 720,
+    "aspectRatio": "16:9"
+  },
+  "usage": {
+    "defaultBackground": "white",
+    "defaultText": "ink",
+    "darkSectionBackground": "black",
+    "secondaryDarkBackground": "navy",
+    "accent": "blue",
+    "forbiddenDecorativeColors": ["red", "orange", "yellow", "green", "purple", "cyan"],
+    "forbiddenPatterns": ["large rounded cards", "gradients", "glows", "glassmorphism", "multi-color module coding", "AI-generated abstract decoration"]
+  }
+}

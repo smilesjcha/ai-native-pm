@@ -1,0 +1,14 @@
+{
+  "name": "kmac-m5-ai-pm-productivity-pptx",
+  "version": "0.1.0",
+  "private": true,
+  "description": "KMAC 기획자 과정 M5 「생성형 AI를 활용한 기획자 업무생산성 향상」 교안 PPT 빌더 (pptxgenjs, Apple 그래머 + 나눔고딕)",
+  "main": "generate.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "node generate.js"
+  },
+  "dependencies": {
+    "pptxgenjs": "^4.0.1"
+  }
+}

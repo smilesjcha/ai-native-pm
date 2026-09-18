@@ -1,0 +1,56 @@
+CHA SUNGJAE · LECTURE PPT DESIGN SYSTEM
+
+PURPOSE
+- 16:9 technical lectures, tutorials, PBL workshops, and instructor-led follow-along sessions.
+- Designed to feel like a restrained Korean fashion-commerce editorial system, not an AI-generated UI kit.
+
+PALETTE
+- Default: white canvas, #191919 text, black key rules.
+- Neutral hierarchy: #555555, #888888, #C7C7C7, #E0E0E0, #F0F0F0, #F5F5F5.
+- Sub-colors only: navy #0B1F3A and information blue #2563EB.
+- Screenshots retain their original colors. Do not add colored overlays.
+- Do not introduce red, orange, yellow, green, purple, cyan, gradients, or glow effects for decoration.
+
+TYPOGRAPHY
+- Authoring preference: Pretendard / Helvetica Neue.
+- Current Mac runtime: AppleGothic. PDF export should not mix NanumGothic and NanumBrush family substitutions.
+- Slide title 32pt by default; section and cover titles are larger. Body is 19pt by default and never below 16pt; caption is 11-12pt.
+- Use weight 600-800. Avoid light body copy.
+- Titles are audience-facing conclusions, not production labels.
+
+GEOMETRY
+- Sharp corners: 0px by default, 4px maximum.
+- Flat surfaces, 1px gray borders, 2px black or blue rules.
+- No floating-card dashboard composition. Use editorial columns and horizontal rules.
+- Page margins 64px. Spacing follows a 4px base unit.
+
+CORE LAYOUTS
+01 Cover: black field, white title, one blue rule, instructor and date at bottom.
+02 Section: black or navy field, hour number and one outcome sentence.
+03 Definition: large term, plain-language meaning, why it matters, concrete example.
+04 Claim: takeaway title, one large claim, one short explanation.
+05 Key points: title plus four compact bullets separated by rules.
+06 Process: numbered horizontal sequence; no rounded cards.
+07 Tutorial map: numbered steps and the exact success signal for each step.
+08 Screenshot: 38% explanation / 62% un-tinted actual screen, with step number.
+09 Code: 34% explanation / 66% black code field, blue left rule.
+10 Exercise: numbered steps, timebox, completion evidence, recovery instruction.
+11 Failure/Recovery: black failure column versus blue recovery column.
+12 Checkpoint: three questions and explicit evidence required.
+
+CONTENT RULES
+- One slide = one teaching job.
+- Every new acronym receives a definition slide before first practical use.
+- Every tutorial sequence includes: entry screen, action, expected screen, success signal, and recovery route.
+- Every lab includes a completion artifact. Every external write includes a Human Approval gate.
+- Every external claim or screenshot URL is recorded in the slide speaker notes [Sources] block.
+
+REUSE
+- design-tokens.json is the single source of color, typography, spacing, and geometry values.
+- design-system.mjs exposes the runtime constants used by PowerPoint builders.
+- IPA_LECTURE_TEMPLATE.pptx is a visual layout catalog.
+- components/ contains reusable monochrome icons, brand marks, and attributed reference images.
+- New deck builders should import design-system.mjs and avoid local color definitions.
+
+REFERENCE NOTE
+- This is a Musinsa-inspired educational presentation system based on the user-provided Oppadu reference. It is not an official Musinsa brand guideline or an official Musinsa template.
