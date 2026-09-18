@@ -292,7 +292,20 @@ function createDeck(cfg = {}) {
     const full = resolveAsset(p);
     if (full && fs.existsSync(full)) {
       // altText: pptxgenjs는 미지정 시 절대경로를 descr 에 넣는다 → 파일명만 남긴다(홈 경로 유출 방지)
-      ctx.s.addImage({ path: full, x, y, w, h, sizing: { type: "contain", x, y, w, h }, altText: path.basename(full) });
+      // 원본 비율 유지 + 구획 가운데 정렬(2026-09-19 사용자 지시) — 비율 변환·늘림 금지
+      let fx = x, fy = y, fw = w, fh = h;
+      try {
+        const b = fs.readFileSync(full);
+        let pw = 0, ph = 0;
+        if (b.toString("ascii", 1, 4) === "PNG") { pw = b.readUInt32BE(16); ph = b.readUInt32BE(20); }
+        else if (b[0] === 0xff && b[1] === 0xd8) { // JPEG SOF 탐색
+          let i = 2;
+          while (i < b.length) { if (b[i] !== 0xff) { i++; continue; } const m = b[i + 1]; const len = b.readUInt16BE(i + 2);
+            if (m >= 0xc0 && m <= 0xcf && m !== 0xc4 && m !== 0xc8 && m !== 0xcc) { ph = b.readUInt16BE(i + 5); pw = b.readUInt16BE(i + 7); break; } i += 2 + len; }
+        }
+        if (pw && ph) { const r = pw / ph; if (w / h > r) { fh = h; fw = h * r; } else { fw = w; fh = w / r; } fx = x + (w - fw) / 2; fy = y + (h - fh) / 2; }
+      } catch (e) {}
+      ctx.s.addImage({ path: full, x: fx, y: fy, w: fw, h: fh, altText: path.basename(full) });
       return true;
     }
     placeholder(ctx, x, y, w, h, label || (p ? path.basename(p) : ""));

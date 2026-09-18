@@ -8,7 +8,7 @@
 
 | 무엇 | 어디 |
 |------|------|
-| **강의안 PDF (배포용, 252장)** | [`assets/pptx/kmac-m5-ai-pm-productivity-20260919-dist.pdf`](assets/pptx/kmac-m5-ai-pm-productivity-20260919-dist.pdf) |
+| **강의안 PDF (배포용, 255장)** | [`assets/pptx/kmac-m5-ai-pm-productivity-20260919-dist.pdf`](assets/pptx/kmac-m5-ai-pm-productivity-20260919-dist.pdf) |
 | **실습 키트 안내** | [`workshop/README.md`](workshop/README.md) |
 | 붙여넣기용 프롬프트(.txt 16개) | [`workshop/prompts-txt/`](workshop/prompts-txt/) |
 | 프롬프트 카드 덱(전체 프롬프트 모음) | [`workshop/prompt-card-deck.md`](workshop/prompt-card-deck.md) |

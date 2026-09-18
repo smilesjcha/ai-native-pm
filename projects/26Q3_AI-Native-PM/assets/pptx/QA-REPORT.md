@@ -119,6 +119,7 @@ unzip -p kmac-m5-ai-pm-productivity-20260919.pptx 'ppt/slides/*.xml' | grep -o -
 
 | 날짜 | 작성자 | 변경 내용 |
 |------|--------|----------|
+| 2026-09-19 | PM 차성재 with Claude Fable 5.1 | 최종본 — 제목 227개 명사형 교체·단일 강조 제거·캡처 자리 29장 실제 이미지·시안 다크 풀블리드·Session 표기, 3사 비교표를 2026-09 공개 자료 추산치로 채워 2장 분할, 이미지 원본 비율 유지·가운데 정렬(lib image()), Q&A·마무리 장표 추가 → 255장, 경고 small-font 7건만 |
 | 2026-09-18 | PM 차성재 with Claude Fable 5.1 | 최종 내보내기 — 표지 제목 수동 줄바꿈 후 재빌드, PowerPoint "PDF로 저장"(export-pdf.sh)으로 강사용 `….pdf`·배포용 `…-dist.pdf`(노트·유형 pill 제거, strip-notes.py) 생성, 나눔고딕 3종 임베드 확인. draft-v0 파일 삭제 |
 | 2026-09-18 | PM 차성재 with Claude Fable 5.1 | 초안 — 4차 빌드 기준 장수(252/252)·블록별 유형 분포·경고 40건(overflow 0)·육안 확인 목록 110장+·발견→수정 8건(lib.js 표 행 높이 em·체크리스트 행 높이/폰트 통일·kicker 1줄·promptBlock kicker 중복·이미지 altText, block1/2/3 문장 축약)·금지 표현 0건·남은 제약 7항·재생성 명령·다음 액션 |
 
